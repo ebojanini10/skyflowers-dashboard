@@ -718,6 +718,246 @@
             }
         }
 
+        /* AWB Logistics Tracking Styles */
+        .awb-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(46, 204, 113, 0.1));
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 4px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .awb-section-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .awb-section-header p {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .awb-full-width {
+            grid-column: 1 / -1;
+        }
+
+        .awb-half-width {
+            grid-column: span 1;
+        }
+
+        .awb-status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .awb-status-badge.pending { background: #ecf0f1; color: #7f8c8d; }
+        .awb-status-badge.farm-shipped { background: #fff3e0; color: #e65100; }
+        .awb-status-badge.in-transit { background: #e3f2fd; color: #1565c0; }
+        .awb-status-badge.arrived { background: #e8f5e9; color: #2e7d32; }
+        .awb-status-badge.customs { background: #fce4ec; color: #c62828; }
+        .awb-status-badge.delivered { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+
+        .awb-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .awb-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 1s ease;
+        }
+
+        .awb-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .awb-table thead tr {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .awb-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .awb-table th:first-child { border-radius: 8px 0 0 0; }
+        .awb-table th:last-child { border-radius: 0 8px 0 0; }
+
+        .awb-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .awb-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .awb-table tbody tr:hover {
+            background: #e8f5e9;
+        }
+
+        .awb-table tbody tr.awb-delayed {
+            border-left: 3px solid #e74c3c;
+        }
+
+        .awb-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+        }
+
+        .awb-pipeline-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .awb-pipeline-label {
+            min-width: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .awb-pipeline-track {
+            flex: 1;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .awb-pipeline-fill {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            min-width: 30px;
+            transition: width 1s ease;
+        }
+
+        .awb-pipeline-fill.status-pending { background: linear-gradient(90deg, #95a5a6, #bdc3c7); }
+        .awb-pipeline-fill.status-farm-shipped { background: linear-gradient(90deg, #e67e22, #f39c12); }
+        .awb-pipeline-fill.status-in-transit { background: linear-gradient(90deg, #2980b9, #3498db); }
+        .awb-pipeline-fill.status-arrived { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .awb-pipeline-fill.status-customs { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+        .awb-pipeline-fill.status-delivered { background: linear-gradient(90deg, #1e8449, #27ae60); }
+
+        .awb-pipeline-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 30px;
+        }
+
+        .awb-daily-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .awb-daily-label {
+            min-width: 80px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .awb-daily-track {
+            flex: 1;
+            height: 24px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .awb-daily-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            min-width: 25px;
+            transition: width 1s ease;
+        }
+
+        .awb-alert-card {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .awb-alert-card.severity-high {
+            background: linear-gradient(135deg, #fde8e8, #fce4ec);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .awb-alert-card.severity-medium {
+            background: linear-gradient(135deg, #fff8e1, #fff3e0);
+            border-left: 4px solid #f39c12;
+        }
+
+        .awb-severity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .awb-severity-badge.high { background: #e74c3c; color: white; }
+        .awb-severity-badge.medium { background: #f39c12; color: white; }
+
+        .awb-alert-message {
+            font-size: 13px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .awb-half-width {
+                grid-column: span 1;
+            }
+            .awb-pipeline-label, .awb-daily-label {
+                min-width: 60px;
+                font-size: 11px;
+            }
+        }
+
         .footer {
             margin-top: 40px;
             text-align: center;
@@ -1374,6 +1614,133 @@
             </div>
         </div>
 
+        <!-- AWB Logistics Tracking Section Header -->
+        <div class="awb-section-header" id="awbSectionHeader">
+            <h2><span>✈️</span> AWB Logistics Tracking</h2>
+            <p>Komet Sales API | <span id="awbDataStatus">Cargando...</span></p>
+        </div>
+
+        <!-- Card F: AWB Summary KPIs -->
+        <div class="dashboard-card awb-full-width" id="awbSummaryCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📦</span>
+                    AWB Summary
+                </div>
+                <div>
+                    <div style="color: #27ae60; font-weight: 600;" id="awbScanInfo">-</div>
+                    <span class="card-timestamp" id="awbTimestamp">-</span>
+                </div>
+            </div>
+            <div class="metrics-grid" id="awbSummaryMetrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-title">AWBs Activos</div>
+                    <div class="metric-number" id="awbMetricTotal">-</div>
+                    <div class="metric-subtitle">En seguimiento</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📦</div>
+                    <div class="metric-title">Piezas Totales</div>
+                    <div class="metric-number" id="awbMetricPieces">-</div>
+                    <div class="metric-subtitle" id="awbMetricPiecesReceived">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-title">Tasa Entrega</div>
+                    <div class="metric-number" id="awbMetricDelivery">-</div>
+                    <div class="metric-subtitle">Piezas recibidas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">✈️</div>
+                    <div class="metric-title">Carriers Activos</div>
+                    <div class="metric-number" id="awbMetricCarriers">-</div>
+                    <div class="metric-subtitle">Aerolineas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⚠️</div>
+                    <div class="metric-title">Alertas</div>
+                    <div class="metric-number" id="awbMetricAlerts">-</div>
+                    <div class="metric-subtitle">Requieren atencion</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔌</div>
+                    <div class="metric-title">API Budget</div>
+                    <div class="metric-number" id="awbMetricAPI">-</div>
+                    <div class="metric-subtitle">Calls usadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card G: Pipeline de Estado (half-width) -->
+        <div class="dashboard-card awb-half-width" id="awbPipelineCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🔄</span>
+                    Pipeline de Estado
+                </div>
+            </div>
+            <div id="awbPipelineChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+        </div>
+
+        <!-- Card H: Volumen Diario (half-width) -->
+        <div class="dashboard-card awb-half-width" id="awbVolumeCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📅</span>
+                    Volumen Diario
+                </div>
+            </div>
+            <div id="awbVolumeChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+        </div>
+
+        <!-- Card I: AWBs Activos Table -->
+        <div class="dashboard-card awb-full-width" id="awbTableCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    AWBs Activos
+                </div>
+                <div style="color: #27ae60; font-weight: 600;" id="awbTableCount">-</div>
+            </div>
+            <div class="awb-scroll">
+                <table class="awb-table" id="awbTable">
+                    <thead>
+                        <tr>
+                            <th>AWB</th>
+                            <th>Origen</th>
+                            <th>Fecha</th>
+                            <th>Carrier</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Piezas</th>
+                            <th style="min-width:100px;">Progreso</th>
+                            <th style="text-align:right;">Dias</th>
+                            <th>Clientes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="awbTableBody">
+                        <tr><td colspan="9" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Card J: AWB Alerts (conditional) -->
+        <div class="dashboard-card awb-full-width" id="awbAlertsCard" style="display:none;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🚨</span>
+                    Alertas Logisticas
+                </div>
+                <div style="color: #e74c3c; font-weight: 600;" id="awbAlertsCount">-</div>
+            </div>
+            <div id="awbAlertsContainer"></div>
+        </div>
+
         <!-- Alert Section -->
         <div class="alert-section">
             <div class="alert-header">
@@ -1848,7 +2215,142 @@
             initDateInputs();
             fetchEmailAnalytics();
             setInterval(fetchEmailAnalytics, EMAIL_REFRESH_INTERVAL);
+            // AWB Tracking
+            fetchAWBTracking();
+            setInterval(fetchAWBTracking, 60000);
         });
+
+        // ================================================================
+        // AWB LOGISTICS TRACKING - Fetch and Render
+        // ================================================================
+
+        const AWB_API_URL = 'http://localhost:5000/awb-tracking';
+
+        function awbStatusClass(label) {
+            return (label || '').toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function renderAWBTracking(data) {
+            const summary = data.summary || {};
+            const awbs = data.awbs || [];
+            const alerts = data.alerts || [];
+            const dailyVolume = data.daily_volume || [];
+            const byStatus = summary.by_status || {};
+            const scanTs = data.generated_at ? formatTimestamp(data.generated_at) : '-';
+
+            // Card F: Summary KPIs
+            document.getElementById('awbMetricTotal').textContent = (summary.total_awbs_active || 0).toLocaleString();
+            document.getElementById('awbMetricPieces').textContent = (summary.total_pieces || 0).toLocaleString();
+            document.getElementById('awbMetricPiecesReceived').textContent = (summary.total_pieces_received || 0).toLocaleString() + ' recibidas';
+            document.getElementById('awbMetricDelivery').textContent = (summary.delivery_rate_pct || 0).toFixed(1) + '%';
+            document.getElementById('awbMetricCarriers').textContent = (summary.carriers_active || 0);
+            document.getElementById('awbMetricAlerts').textContent = (summary.alerts_count || 0);
+            document.getElementById('awbMetricAPI').textContent = (data.api_calls_used || 0) + ' calls';
+            document.getElementById('awbScanInfo').textContent = 'Scan: ' + (data.scan_period_days || 7) + ' dias';
+            document.getElementById('awbTimestamp').textContent = 'Actualizado: ' + scanTs;
+
+            // Card G: Pipeline de Estado
+            const pipelineOrder = [
+                { key: 'pending', label: 'Pending' },
+                { key: 'farm_shipped', label: 'Farm Shipped' },
+                { key: 'in_transit', label: 'In Transit' },
+                { key: 'arrived', label: 'Arrived' },
+                { key: 'customs', label: 'Customs' },
+                { key: 'delivered', label: 'Delivered' },
+            ];
+            const totalAWBs = summary.total_awbs_active || 1;
+            const pipelineChart = document.getElementById('awbPipelineChart');
+            pipelineChart.innerHTML = pipelineOrder.map(s => {
+                const count = byStatus[s.key] || 0;
+                const pct = Math.max(Math.round((count / totalAWBs) * 100), count > 0 ? 8 : 0);
+                return '<div class="awb-pipeline-bar">' +
+                    '<div class="awb-pipeline-label">' + s.label + '</div>' +
+                    '<div class="awb-pipeline-track">' +
+                    '<div class="awb-pipeline-fill status-' + awbStatusClass(s.label) + '" style="width:' + pct + '%;">' + count + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+
+            // Card H: Volumen Diario
+            const volumeChart = document.getElementById('awbVolumeChart');
+            if (dailyVolume.length === 0) {
+                volumeChart.innerHTML = '<div style="text-align:center;color:#7f8c8d;">Sin datos de volumen</div>';
+            } else {
+                const maxPieces = Math.max(...dailyVolume.map(d => d.pieces_shipped || 0), 1);
+                const recentDays = dailyVolume.slice(0, 7);
+                volumeChart.innerHTML = recentDays.map(d => {
+                    const pct = Math.round(((d.pieces_shipped || 0) / maxPieces) * 100);
+                    const dateLabel = d.date || '-';
+                    return '<div class="awb-daily-bar">' +
+                        '<div class="awb-daily-label">' + dateLabel + '</div>' +
+                        '<div class="awb-daily-track">' +
+                        '<div class="awb-daily-fill" style="width:' + pct + '%;">' + (d.pieces_shipped || 0) + '</div>' +
+                        '</div>' +
+                        '<div style="font-size:11px;color:#7f8c8d;min-width:40px;">' + (d.awbs_shipped || 0) + ' AWBs</div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            // Card I: AWBs Table
+            document.getElementById('awbTableCount').textContent = awbs.length + ' AWBs';
+            const tableBody = document.getElementById('awbTableBody');
+            if (awbs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#7f8c8d;">Sin AWBs activos</td></tr>';
+            } else {
+                tableBody.innerHTML = awbs.map((a, i) => {
+                    const delayClass = a.is_delayed ? ' awb-delayed' : '';
+                    const statusBadge = '<span class="awb-status-badge ' + awbStatusClass(a.status_label) + '">' + (a.status_label || '-') + '</span>';
+                    const pct = a.delivery_pct || 0;
+                    const progressBar = '<div class="awb-progress-bar"><div class="awb-progress-fill" style="width:' + pct + '%;"></div></div>' +
+                        '<div style="font-size:10px;color:#7f8c8d;text-align:center;">' + pct.toFixed(0) + '%</div>';
+                    const customers = (a.customers || []).slice(0, 2).join(', ') || '-';
+                    const piecesText = (a.pieces_received || 0) + '/' + (a.pieces || 0);
+                    return '<tr class="' + delayClass + '">' +
+                        '<td style="font-weight:600;white-space:nowrap;">' + (a.awb || '-') + '</td>' +
+                        '<td>' + (a.origin || '-') + '</td>' +
+                        '<td style="white-space:nowrap;font-size:12px;">' + (a.ship_date || '-') + '</td>' +
+                        '<td style="font-size:12px;">' + (a.carrier_name || '-') + '</td>' +
+                        '<td>' + statusBadge + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + piecesText + '</td>' +
+                        '<td style="min-width:100px;">' + progressBar + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + (a.days_since_ship || 0) + '</td>' +
+                        '<td style="font-size:12px;">' + customers + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            // Card J: Alerts
+            const alertsCard = document.getElementById('awbAlertsCard');
+            if (alerts.length === 0) {
+                alertsCard.style.display = 'none';
+            } else {
+                alertsCard.style.display = '';
+                document.getElementById('awbAlertsCount').textContent = alerts.length + ' alertas';
+                const alertsContainer = document.getElementById('awbAlertsContainer');
+                alertsContainer.innerHTML = alerts.map(a => {
+                    const sevClass = (a.severity || 'medium').toLowerCase();
+                    return '<div class="awb-alert-card severity-' + sevClass + '">' +
+                        '<span class="awb-severity-badge ' + sevClass + '">' + (a.severity || 'INFO') + '</span>' +
+                        '<div class="awb-alert-message">' + (a.message || '') + '</div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        async function fetchAWBTracking() {
+            try {
+                const response = await fetch(AWB_API_URL);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                document.getElementById('awbDataStatus').textContent = 'Datos en vivo via Bot API';
+                document.getElementById('awbDataStatus').style.color = '#27ae60';
+                renderAWBTracking(data);
+            } catch (err) {
+                console.log('AWB API not available:', err.message);
+                document.getElementById('awbDataStatus').textContent = 'Sin conexion - ejecutar scanner';
+                document.getElementById('awbDataStatus').style.color = '#e74c3c';
+            }
+        }
     </script>
 </body>
 </html>
