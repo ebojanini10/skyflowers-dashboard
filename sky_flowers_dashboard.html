@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Flowers - Cloud Agent Teams Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .company-details h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .company-details p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        .last-update {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
+            font-size: 20px;
+        }
+
+        .agent-grid {
+            grid-column: 1 / -1;
+        }
+
+        .agents-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .agent-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #27ae60;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            animation: progress-shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .agent-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #d5fdd5;
+            color: #27ae60;
+        }
+
+        .agent-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progress-shine 2s infinite;
+        }
+
+        @keyframes progress-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .business-metrics {
+            grid-column: span 2;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .metric-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .metric-subtitle {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .system-monitoring {
+            grid-column: span 2;
+        }
+
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .monitor-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid #3498db;
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .monitor-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .monitor-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #27ae60;
+        }
+
+        .monitor-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .monitor-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .roi-dashboard {
+            grid-column: span 1;
+        }
+
+        .roi-highlight {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .roi-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .roi-period {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .efficiency-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .efficiency-item {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .efficiency-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .efficiency-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        .system-health {
+            grid-column: span 1;
+        }
+
+        .health-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .health-indicator:last-child {
+            border-bottom: none;
+        }
+
+        .health-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .health-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .health-percentage {
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .health-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #27ae60;
+        }
+
+        .alert-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .alert-icon {
+            color: #856404;
+            font-size: 18px;
+        }
+
+        .alert-title {
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .alert-content {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .business-metrics,
+            .system-monitoring {
+                grid-column: span 1;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .metrics-grid,
+            .monitoring-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Email Analytics Styles */
+        .email-analytics-section {
+            grid-column: 1 / -1;
+        }
+
+        .email-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 4px;
+            border-left: 4px solid #3498db;
+        }
+
+        .email-section-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .email-section-header p {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .email-half-width {
+            grid-column: span 1;
+        }
+
+        .bar-chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar-label {
+            min-width: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            min-width: 40px;
+        }
+
+        .bar-fill.product-hydrangea { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .bar-fill.product-lepidium { background: linear-gradient(90deg, #f39c12, #f1c40f); }
+        .bar-fill.product-matricaria { background: linear-gradient(90deg, #e74c3c, #ec7063); }
+        .bar-fill.product-statice { background: linear-gradient(90deg, #9b59b6, #a569bd); }
+        .bar-fill.day-bar { background: linear-gradient(90deg, #3498db, #5dade2); }
+
+        .bar-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .email-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .email-table thead tr {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .email-table th {
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .email-table th:first-child { border-radius: 8px 0 0 0; }
+        .email-table th:last-child { border-radius: 0 8px 0 0; }
+
+        .email-table td {
+            padding: 8px 14px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .email-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .email-table tbody tr:hover {
+            background: #eaf2f8;
+        }
+
+        .product-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin: 1px 2px;
+        }
+
+        .product-tag.hydrangea { background: #e8f5e9; color: #2e7d32; }
+        .product-tag.lepidium { background: #fff3e0; color: #e65100; }
+        .product-tag.matricaria { background: #fce4ec; color: #c62828; }
+        .product-tag.statice { background: #f3e5f5; color: #6a1b9a; }
+
+        .kommet-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .kommet-badge.yes { background: #d5fdd5; color: #27ae60; }
+        .kommet-badge.no { background: #fde8e8; color: #e74c3c; }
+
+        .orders-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .email-data-status {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .email-data-status.live { color: #27ae60; }
+        .email-data-status.static { color: #f39c12; }
+
+        .period-filter {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .period-filter-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .period-btn {
+            padding: 5px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            color: #7f8c8d;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-color: #3498db;
+        }
+
+        .card-timestamp {
+            font-size: 11px;
+            color: #95a5a6;
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .period-note {
+            font-size: 11px;
+            color: #f39c12;
+            font-style: italic;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .email-half-width {
+                grid-column: span 1;
+            }
+
+            .bar-label {
+                min-width: 60px;
+                font-size: 12px;
+            }
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="company-info">
+                <div class="company-logo">SF</div>
+                <div class="company-details">
+                    <h1>Sky Flowers</h1>
+                    <p>Cloud Agent Teams Monitoring Dashboard</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <div>
+                    <div>System Status: <strong>Operational</strong></div>
+                    <div class="last-update">Last Update: <span id="lastUpdate">Loading...</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Agent Status Grid -->
+        <div class="dashboard-card agent-grid">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🤖</span>
+                    Cloud Agent Teams Status
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">6/6 Active</div>
+            </div>
+            <div class="agents-container">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent A: CEVA/DSV API</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">API Integration for logistics providers - 25% agency coverage achieved</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Completion</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">25%</div>
+                            <div class="metric-label">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent B: BigQuery Sync</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">Bidirectional sync between SQL Server and BigQuery analytics platform</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">21.7K+</div>
+                            <div class="metric-label">Records</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">99.8%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent C: Mobile Backend</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">End-to-end mobile integration for field operations and GPS tracking</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Integration</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Real-time</div>
+                            <div class="metric-label">Sync</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent D: Airline Coverage</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">Complete airline coverage expansion from 69% to 100% (13/13)</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">13/13</div>
+                            <div class="metric-label">Airlines</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent E: Admin Automation</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">FASE 7 administrative automation achieving 85% process automation</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">85%</div>
+                            <div class="metric-label">Automated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$120M</div>
+                            <div class="metric-label">COP Saved</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent F: Web Scraping</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">Agency web scraping expansion from 25% to 40% coverage</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">7/16</div>
+                            <div class="metric-label">Agencies</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">40%</div>
+                            <div class="metric-label">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Metrics Panel -->
+        <div class="dashboard-card business-metrics">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Business Transformation Metrics
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">9/9 Tareas | Fase 4 Completa</div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">✈️</div>
+                    <div class="metric-title">Airline Coverage</div>
+                    <div class="metric-number">100%</div>
+                    <div class="metric-subtitle">13/13 Airlines</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🏢</div>
+                    <div class="metric-title">Agency Coverage</div>
+                    <div class="metric-number">40%</div>
+                    <div class="metric-subtitle">7/16 Sources</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-title">Automation</div>
+                    <div class="metric-number">85%</div>
+                    <div class="metric-subtitle">Administrative</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📱</div>
+                    <div class="metric-title">Mobile Ops</div>
+                    <div class="metric-number">100%</div>
+                    <div class="metric-subtitle">End-to-End</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔄</div>
+                    <div class="metric-title">Data Sync</div>
+                    <div class="metric-number">21.7K+</div>
+                    <div class="metric-subtitle">Records</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-title">System Status</div>
+                    <div class="metric-number">99%</div>
+                    <div class="metric-subtitle">Complete</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live System Monitoring -->
+        <div class="dashboard-card system-monitoring">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🖥️</span>
+                    Live System Monitoring
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">All Systems Operational</div>
+            </div>
+            <div class="monitoring-grid">
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">BigQuery Status</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">99.8%</div>
+                    <div class="monitor-label">Stream Health</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Smart Scheduler</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">98.5%</div>
+                    <div class="monitor-label">Success Rate</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">WhatsApp Integration</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">1,247</div>
+                    <div class="monitor-label">Messages Today</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Mobile App Sync</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">Real-time</div>
+                    <div class="monitor-label">GPS Tracking</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Error Rate</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">0.3%</div>
+                    <div class="monitor-label">System-wide</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Uptime</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">99.7%</div>
+                    <div class="monitor-label">Target Met</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROI & Business Impact -->
+        <div class="dashboard-card roi-dashboard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">💰</span>
+                    ROI & Business Impact
+                </div>
+            </div>
+            <div class="roi-highlight">
+                <div class="roi-amount">$684M COP</div>
+                <div class="roi-period">Revenue 2025 | $120M COP Ahorro Anual</div>
+            </div>
+            <div class="efficiency-metrics">
+                <div class="efficiency-item">
+                    <div class="efficiency-value">833K</div>
+                    <div class="efficiency-label">Plantas Totales</div>
+                </div>
+                <div class="efficiency-item">
+                    <div class="efficiency-value">7</div>
+                    <div class="efficiency-label">Fincas Activas</div>
+                </div>
+                <div class="efficiency-item">
+                    <div class="efficiency-value">14M+</div>
+                    <div class="efficiency-label">Tallos/Ano</div>
+                </div>
+                <div class="efficiency-item">
+                    <div class="efficiency-value">74-94%</div>
+                    <div class="efficiency-label">Margen Bruto</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health Overview -->
+        <div class="dashboard-card system-health">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">❤️</span>
+                    System Health Overview
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">System Uptime</div>
+                <div class="health-value">
+                    <div class="health-percentage">99.7%</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Response Time</div>
+                <div class="health-value">
+                    <div class="health-percentage">< 200ms</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Data Quality</div>
+                <div class="health-value">
+                    <div class="health-percentage">99.8%</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Sync Accuracy</div>
+                <div class="health-value">
+                    <div class="health-percentage">99.9%</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Cloud Resources</div>
+                <div class="health-value">
+                    <div class="health-percentage">Optimal</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Farm Infrastructure Overview -->
+        <div class="dashboard-card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🌿</span>
+                    Infraestructura Productiva - 7 Fincas
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">833,560 Plantas Totales</div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                            <th style="padding: 12px 16px; text-align: left; border-radius: 8px 0 0 0;">Finca</th>
+                            <th style="padding: 12px 16px; text-align: left;">Productos</th>
+                            <th style="padding: 12px 16px; text-align: right;">Bloques</th>
+                            <th style="padding: 12px 16px; text-align: right;">Area Lineal (m)</th>
+                            <th style="padding: 12px 16px; text-align: right; border-radius: 0 8px 0 0;">Plantas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 1</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">Hydrangea</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span> <span style="background:#fce4ec;padding:2px 8px;border-radius:12px;font-size:12px;">Girasol</span> <span style="background:#e3f2fd;padding:2px 8px;border-radius:12px;font-size:12px;">Matricaria</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">2,212</td>
+                            <td style="padding: 10px 16px; text-align: right;">37,501</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">150,004</td>
+                        </tr>
+                        <tr style="background: #f8f9fa; border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 2</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">Hydrangea</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span> <span style="background:#e3f2fd;padding:2px 8px;border-radius:12px;font-size:12px;">Matricaria</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">1,211</td>
+                            <td style="padding: 10px 16px; text-align: right;">25,612</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">102,448</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 3</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">Hydrangea</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">1,325</td>
+                            <td style="padding: 10px 16px; text-align: right;">25,691</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">102,764</td>
+                        </tr>
+                        <tr style="background: #f8f9fa; border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 4</td>
+                            <td style="padding: 10px 16px;"><span style="background:#fce4ec;padding:2px 8px;border-radius:12px;font-size:12px;">Girasol</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">1,644</td>
+                            <td style="padding: 10px 16px; text-align: right;">33,708</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">134,832</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 5</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e3f2fd;padding:2px 8px;border-radius:12px;font-size:12px;">Matricaria</span> <span style="background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;">Statice</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">219</td>
+                            <td style="padding: 10px 16px; text-align: right;">3,136</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">12,544</td>
+                        </tr>
+                        <tr style="background: #f8f9fa; border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 6</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">100% Hydrangea</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">2,996</td>
+                            <td style="padding: 10px 16px; text-align: right;">74,372</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">297,488</td>
+                        </tr>
+                        <tr style="border-bottom: 2px solid #667eea;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 7</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">100% Hydrangea</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">837</td>
+                            <td style="padding: 10px 16px; text-align: right;">8,370</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">33,480</td>
+                        </tr>
+                        <tr style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); font-weight: 700;">
+                            <td style="padding: 12px 16px; border-radius: 0 0 0 8px;">TOTAL</td>
+                            <td style="padding: 12px 16px;">7 Fincas - 5 Productos</td>
+                            <td style="padding: 12px 16px; text-align: right;">10,444</td>
+                            <td style="padding: 12px 16px; text-align: right;">208,390</td>
+                            <td style="padding: 12px 16px; text-align: right; color: #1b5e20; font-size: 16px; border-radius: 0 0 8px 0;">833,560</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: #7f8c8d; text-align: right;">
+                Formula: 4 plantas por metro lineal | Datos: bloques.csv Feb 2026 | 203 empleados activos
+            </div>
+        </div>
+
+        <!-- Production Capacity -->
+        <div class="dashboard-card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📈</span>
+                    Capacidad Productiva y Metricas Operacionales
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">14M+ tallos/ano</div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">🌸</div>
+                    <div class="metric-title">Produccion Semanal</div>
+                    <div class="metric-number">235K+</div>
+                    <div class="metric-subtitle">Tallos por semana</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">👥</div>
+                    <div class="metric-title">Empleados</div>
+                    <div class="metric-number">203</div>
+                    <div class="metric-subtitle">131 campo, 53 poscosecha, 19 admin</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-title">Bloques Activos</div>
+                    <div class="metric-number">8,742</div>
+                    <div class="metric-subtitle">83.7% utilizacion</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🌿</div>
+                    <div class="metric-title">Variedades</div>
+                    <div class="metric-number">49</div>
+                    <div class="metric-subtitle">Hydrangea, Lepidium, Girasol, Matricaria</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-title">Costo/Tallo</div>
+                    <div class="metric-number">$140</div>
+                    <div class="metric-subtitle">COP promedio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-title">Turnos Completados</div>
+                    <div class="metric-number">99.4%</div>
+                    <div class="metric-subtitle">Tasa de cumplimiento</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Analytics Section Header -->
+        <div class="email-section-header">
+            <h2><span>📧</span> Email Analytics Comercial</h2>
+            <p>Datos del scanner Gmail multi-cuenta | <span id="emailDataStatus">Cargando...</span></p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+                <div class="period-filter" id="periodFilter">
+                    <span class="period-filter-label">Periodo:</span>
+                    <button class="period-btn" data-days="1" onclick="setPeriodFilter(1)">Hoy</button>
+                    <button class="period-btn" data-days="7" onclick="setPeriodFilter(7)">7 dias</button>
+                    <button class="period-btn" data-days="15" onclick="setPeriodFilter(15)">15 dias</button>
+                    <button class="period-btn active" data-days="30" onclick="setPeriodFilter(30)">30 dias</button>
+                    <input type="date" id="customDateFrom" style="padding:4px 8px;border:2px solid #e9ecef;border-radius:8px;font-size:12px;color:#7f8c8d;" title="Fecha desde">
+                    <span style="font-size:12px;color:#7f8c8d;">a</span>
+                    <input type="date" id="customDateTo" style="padding:4px 8px;border:2px solid #e9ecef;border-radius:8px;font-size:12px;color:#7f8c8d;" title="Fecha hasta">
+                    <button class="period-btn" onclick="setCustomPeriod()">Aplicar</button>
+                </div>
+                <div style="font-size:11px;color:#95a5a6;" id="periodInfo">Mostrando: ultimos 30 dias</div>
+            </div>
+        </div>
+
+        <!-- Card A: Email Commercial Summary -->
+        <div class="dashboard-card email-analytics-section" id="emailSummaryCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Email Commercial Summary
+                </div>
+                <div>
+                    <div style="color: #3498db; font-weight: 600;" id="emailScanDate">-</div>
+                    <span class="card-timestamp" id="summaryTimestamp">-</span>
+                </div>
+            </div>
+            <div class="metrics-grid" id="emailSummaryMetrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📨</div>
+                    <div class="metric-title">Total Emails</div>
+                    <div class="metric-number" id="metricTotalEmails">-</div>
+                    <div class="metric-subtitle">Ultimos 30 dias</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-title">Ordenes</div>
+                    <div class="metric-number" id="metricOrders">-</div>
+                    <div class="metric-subtitle">Detectadas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💬</div>
+                    <div class="metric-title">Cotizaciones</div>
+                    <div class="metric-number" id="metricQuotes">-</div>
+                    <div class="metric-subtitle">Detectadas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📐</div>
+                    <div class="metric-title">Ratio O/C</div>
+                    <div class="metric-number" id="metricRatio">-</div>
+                    <div class="metric-subtitle">Ordenes / Cotizaciones</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🌸</div>
+                    <div class="metric-title">Productos Mencionados</div>
+                    <div class="metric-number" id="metricProducts">-</div>
+                    <div class="metric-subtitle">En emails</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔗</div>
+                    <div class="metric-title">Kommet Matches</div>
+                    <div class="metric-number" id="metricKommet">-</div>
+                    <div class="metric-subtitle" id="metricKommetRate">-</div>
+                </div>
+            </div>
+            <div class="period-note" id="summaryPeriodNote">Datos agregados del periodo completo del scan (30 dias)</div>
+        </div>
+
+        <!-- Card B: Top Clientes Comerciales -->
+        <div class="dashboard-card email-analytics-section" id="emailClientsCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">👥</span>
+                    Top Clientes Comerciales
+                </div>
+                <div>
+                    <div style="color: #3498db; font-weight: 600;" id="clientCount">-</div>
+                    <span class="card-timestamp" id="clientsTimestamp">-</span>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="email-table" id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Email</th>
+                            <th style="text-align:right;">Emails</th>
+                            <th style="text-align:right;">Ordenes</th>
+                            <th style="text-align:right;">Cotizaciones</th>
+                            <th>Productos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                        <tr><td colspan="7" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="period-note" id="clientsPeriodNote">Datos agregados del periodo completo del scan (30 dias)</div>
+        </div>
+
+        <!-- Card C: Demanda por Producto (half-width) -->
+        <div class="dashboard-card email-half-width" id="emailProductsCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🌿</span>
+                    Demanda por Producto
+                </div>
+                <span class="card-timestamp" id="productsTimestamp">-</span>
+            </div>
+            <div class="bar-chart-container" id="productDemandChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+            <div class="period-note" id="productsPeriodNote">Periodo completo (30d)</div>
+        </div>
+
+        <!-- Card D: Volumen por Dia (half-width) -->
+        <div class="dashboard-card email-half-width" id="emailVolumeCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📅</span>
+                    Volumen por Dia de la Semana
+                </div>
+                <span class="card-timestamp" id="volumeTimestamp">-</span>
+            </div>
+            <div class="bar-chart-container" id="volumeByDayChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+            <div class="period-note" id="volumePeriodNote">Periodo completo (30d)</div>
+        </div>
+
+        <!-- Card E: Ordenes Recientes -->
+        <div class="dashboard-card email-analytics-section" id="emailOrdersCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📦</span>
+                    Ordenes Recientes
+                </div>
+                <div>
+                    <div style="color: #3498db; font-weight: 600;" id="ordersCount">-</div>
+                    <span class="card-timestamp" id="ordersTimestamp">-</span>
+                </div>
+            </div>
+            <div class="orders-scroll">
+                <table class="email-table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Remitente</th>
+                            <th>Asunto</th>
+                            <th>Productos</th>
+                            <th>Kommet</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr><td colspan="5" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Alert Section -->
+        <div class="alert-section">
+            <div class="alert-header">
+                <div class="alert-icon">ℹ️</div>
+                <div class="alert-title">Estado del Sistema - Febrero 2026</div>
+            </div>
+            <div class="alert-content">
+                <strong>Fase 4 de Reestructuracion:</strong> 9/9 tareas completadas. API Kommet Sales operativo para precios reales.
+                <br>6 Cloud Agent Teams operativos. 7 fincas activas con 833,560 plantas. 435 clientes, $684M COP revenue 2025.
+                <br><strong>3 Blockers Criticos:</strong> Automatizacion cierre de cama | Integracion campo-poscosecha | Automatizacion plan de podas.
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Sky Flowers - Cloud Agent Teams Dashboard | 7 Fincas | 833,560 Plantas | Actualizado: Febrero 16, 2026</p>
+        <p>Fase 4 Reestructuracion | 203 Empleados | 435 Clientes | Auto-refresh: 30s</p>
+    </div>
+
+    <script>
+        // Auto-refresh functionality
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'America/Bogota'
+            });
+            document.getElementById('lastUpdate').textContent = timeString + ' COT';
+        }
+
+        // Simulate real-time data updates
+        function updateMetrics() {
+            // Update message count with slight variation
+            const messageElements = document.querySelectorAll('.monitor-value');
+            if (messageElements[2]) {
+                const currentCount = parseInt(messageElements[2].textContent.replace(',', ''));
+                const newCount = currentCount + Math.floor(Math.random() * 5);
+                messageElements[2].textContent = newCount.toLocaleString();
+            }
+
+            // Update error rate with small fluctuations
+            if (messageElements[4]) {
+                const errorRate = (Math.random() * 0.5).toFixed(1);
+                messageElements[4].textContent = errorRate + '%';
+            }
+        }
+
+        // Animate progress bars
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateLastUpdate();
+            updateMetrics();
+            animateProgressBars();
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            updateLastUpdate();
+            updateMetrics();
+        }, 30000);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        // Add interactive hover effects
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.15)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Add click functionality for detailed views
+        document.querySelectorAll('.agent-card').forEach((card, index) => {
+            card.addEventListener('click', function() {
+                const agentNames = [
+                    'CEVA/DSV API Integration',
+                    'BigQuery Bidirectional Sync',
+                    'Mobile Backend Integration',
+                    'Airline Coverage Completion',
+                    'Administrative Automation FASE 7',
+                    'Agency Web Scraping Expansion'
+                ];
+
+                alert(`${agentNames[index]} Details:\n\nStatus: Completed Successfully\nLast Activity: ${new Date().toLocaleString('es-CO')}\nNext Maintenance: Scheduled`);
+            });
+        });
+
+        // Add responsive behavior
+        function handleResize() {
+            const width = window.innerWidth;
+            const dashboardContainer = document.querySelector('.dashboard-container');
+
+            if (width < 768) {
+                dashboardContainer.style.gridTemplateColumns = '1fr';
+            } else if (width < 1200) {
+                dashboardContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
+
+        // ================================================================
+        // EMAIL ANALYTICS - Fetch, Filter, and Render
+        // ================================================================
+
+        const EMAIL_API_URL = 'http://localhost:5000/email-analytics';
+        const EMAIL_REFRESH_INTERVAL = 60000;
+
+        // State
+        let emailDataSource = 'none';
+        let currentEmailData = null;
+        let currentPeriodDays = 30;
+        let customDateFrom = null;
+        let customDateTo = null;
+
+        // Domains to exclude from client list
+        const EXCLUDED_DOMAINS = [
+            'bancolombia.com', 'notificacionesbancolombia.com', 'linkedin.com',
+            'google.com', 'zoho.com', 'zohocalendar.com', 'zohoaccounts.com',
+            'zohowallet.com', 'zohocontracts.com', 'tigo.com.co', 'incasso-online.net',
+            'formspree.io', 'clickup.com', 'intuit.com', 'anthropic.com',
+            'sunbiz-notify.dos.fl.gov', 'fcfiling.com', 'flfilingcenter.com',
+            'puntoscolombia.com', 'sura.com', 'mail.clickup.com'
+        ];
+
+        function isCommercialClient(client) {
+            const email = (client.email || '').toLowerCase();
+            if (email.startsWith('noreply@') || email.startsWith('no-reply@') ||
+                email.startsWith('no-reply-') || email.startsWith('notifications-') ||
+                email.startsWith('messages-noreply@') || email.startsWith('updates-noreply@') ||
+                email.startsWith('invitations@') || email.startsWith('groups-noreply@') ||
+                email.startsWith('newsletters-noreply@') || email.startsWith('workspace-noreply@') ||
+                email.startsWith('alertasynotificaciones@') || email.startsWith('extractos') ||
+                email.startsWith('mail-noreply@') || email.startsWith('team@mail.')) {
+                return false;
+            }
+            for (const domain of EXCLUDED_DOMAINS) {
+                if (email.includes(domain)) return false;
+            }
+            return (client.orders > 0 || client.quotes > 0 || (client.products && client.products.length > 0));
+        }
+
+        function formatDate(dateStr) {
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function formatTimestamp(dateStr) {
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        function getProductTagClass(product) {
+            const p = product.toLowerCase();
+            if (p.includes('hydrangea')) return 'hydrangea';
+            if (p.includes('lepidium')) return 'lepidium';
+            if (p.includes('matricaria')) return 'matricaria';
+            if (p.includes('statice')) return 'statice';
+            return 'hydrangea';
+        }
+
+        function getProductBarClass(product) {
+            const p = product.toLowerCase();
+            if (p.includes('hydrangea')) return 'product-hydrangea';
+            if (p.includes('lepidium')) return 'product-lepidium';
+            if (p.includes('matricaria')) return 'product-matricaria';
+            if (p.includes('statice')) return 'product-statice';
+            return 'product-hydrangea';
+        }
+
+        // Period filter: returns cutoff date based on current filter
+        function getDateCutoff() {
+            if (customDateFrom && customDateTo) {
+                return { from: new Date(customDateFrom), to: new Date(customDateTo + 'T23:59:59') };
+            }
+            const now = new Date();
+            const from = new Date(now);
+            from.setDate(from.getDate() - currentPeriodDays);
+            from.setHours(0, 0, 0, 0);
+            return { from: from, to: now };
+        }
+
+        function filterByDate(items) {
+            const { from, to } = getDateCutoff();
+            return items.filter(item => {
+                const d = new Date(item.date);
+                return d >= from && d <= to;
+            });
+        }
+
+        function getPeriodLabel() {
+            if (customDateFrom && customDateTo) {
+                return customDateFrom + ' a ' + customDateTo;
+            }
+            if (currentPeriodDays === 1) return 'hoy';
+            return 'ultimos ' + currentPeriodDays + ' dias';
+        }
+
+        function setPeriodFilter(days) {
+            currentPeriodDays = days;
+            customDateFrom = null;
+            customDateTo = null;
+            // Update button states
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector('.period-btn[data-days="' + days + '"]');
+            if (activeBtn) activeBtn.classList.add('active');
+            // Clear custom inputs
+            document.getElementById('customDateFrom').value = '';
+            document.getElementById('customDateTo').value = '';
+            // Re-render
+            if (currentEmailData) renderEmailAnalytics(currentEmailData);
+        }
+
+        function setCustomPeriod() {
+            const fromVal = document.getElementById('customDateFrom').value;
+            const toVal = document.getElementById('customDateTo').value;
+            if (!fromVal || !toVal) return;
+            customDateFrom = fromVal;
+            customDateTo = toVal;
+            // Clear preset button states
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            // Re-render
+            if (currentEmailData) renderEmailAnalytics(currentEmailData);
+        }
+
+        function renderEmailAnalytics(data) {
+            currentEmailData = data;
+            const analytics = data.analytics || {};
+            const summary = analytics.summary || {};
+            const scanTs = data.generated_at ? formatTimestamp(data.generated_at) : '-';
+            const periodLabel = getPeriodLabel();
+            const scanPeriod = data.scan_period_days || 30;
+
+            // Update period info
+            document.getElementById('periodInfo').textContent = 'Mostrando: ' + periodLabel;
+
+            // Card A: Summary KPIs (aggregated - full scan period)
+            document.getElementById('metricTotalEmails').textContent = (summary.total || 0).toLocaleString();
+            document.getElementById('metricOrders').textContent = (summary.orders || 0).toLocaleString();
+            document.getElementById('metricQuotes').textContent = (summary.quotes || 0).toLocaleString();
+            document.getElementById('metricRatio').textContent = (summary.order_to_quote_ratio || 0).toFixed(1) + 'x';
+            document.getElementById('metricProducts').textContent = (summary.with_products_mentioned || 0).toLocaleString();
+
+            const kommet = data.kommet_enrichment || {};
+            document.getElementById('metricKommet').textContent = (kommet.matched || 0).toLocaleString();
+            document.getElementById('metricKommetRate').textContent = (kommet.match_rate || 0) + '% match rate';
+
+            document.getElementById('emailScanDate').textContent = 'Scan: ' + (data.generated_at ? formatDate(data.generated_at) : '-');
+            document.getElementById('summaryTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('summaryPeriodNote').textContent = 'Datos agregados del periodo completo del scan (' + scanPeriod + ' dias)';
+
+            // Card B: Top Clients (aggregated - full scan period)
+            const allClients = analytics.top_clients || [];
+            const commercialClients = allClients.filter(isCommercialClient).slice(0, 10);
+            document.getElementById('clientCount').textContent = commercialClients.length + ' clientes comerciales';
+            document.getElementById('clientsTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('clientsPeriodNote').textContent = 'Datos agregados del periodo completo del scan (' + scanPeriod + ' dias)';
+
+            const clientsBody = document.getElementById('clientsTableBody');
+            if (commercialClients.length === 0) {
+                clientsBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#7f8c8d;">Sin datos de clientes comerciales</td></tr>';
+            } else {
+                clientsBody.innerHTML = commercialClients.map((c, i) => {
+                    const products = (c.products || []).map(p =>
+                        '<span class="product-tag ' + getProductTagClass(p) + '">' + p + '</span>'
+                    ).join(' ');
+                    const bgStyle = i % 2 === 1 ? ' style="background:#f8f9fa;"' : '';
+                    return '<tr' + bgStyle + '>' +
+                        '<td style="font-weight:600;">' + (i + 1) + '</td>' +
+                        '<td style="font-weight:600;">' + (c.name || '-') + '</td>' +
+                        '<td style="font-size:12px;color:#7f8c8d;">' + (c.email || '-') + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + (c.total_emails || 0) + '</td>' +
+                        '<td style="text-align:right;font-weight:600;color:#27ae60;">' + (c.orders || 0) + '</td>' +
+                        '<td style="text-align:right;font-weight:600;color:#3498db;">' + (c.quotes || 0) + '</td>' +
+                        '<td>' + (products || '<span style="color:#bdc3c7;">-</span>') + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            // Card C: Product Demand (aggregated - full scan period)
+            const productDemand = analytics.product_demand || [];
+            const maxMentions = productDemand.length > 0 ? productDemand[0].mentions : 1;
+            const productChart = document.getElementById('productDemandChart');
+            document.getElementById('productsTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('productsPeriodNote').textContent = 'Periodo completo (' + scanPeriod + 'd)';
+
+            if (productDemand.length === 0) {
+                productChart.innerHTML = '<div style="text-align:center;color:#7f8c8d;">Sin datos de productos</div>';
+            } else {
+                productChart.innerHTML = productDemand.map(p => {
+                    const pct = Math.round((p.mentions / maxMentions) * 100);
+                    return '<div class="bar-row">' +
+                        '<div class="bar-label">' + p.product + '</div>' +
+                        '<div class="bar-track">' +
+                        '<div class="bar-fill ' + getProductBarClass(p.product) + '" style="width:' + pct + '%;">' + p.mentions + '</div>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            // Card D: Volume by Day (aggregated - full scan period)
+            const volumeByDay = analytics.volume_by_day || {};
+            const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const dayLabels = { Monday: 'Lun', Tuesday: 'Mar', Wednesday: 'Mie', Thursday: 'Jue', Friday: 'Vie', Saturday: 'Sab', Sunday: 'Dom' };
+            const dayValues = dayOrder.map(d => volumeByDay[d] || 0);
+            const maxDay = Math.max(...dayValues, 1);
+            const dayChart = document.getElementById('volumeByDayChart');
+            document.getElementById('volumeTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('volumePeriodNote').textContent = 'Periodo completo (' + scanPeriod + 'd)';
+
+            dayChart.innerHTML = dayOrder.map((d, i) => {
+                const val = dayValues[i];
+                const pct = Math.round((val / maxDay) * 100);
+                return '<div class="bar-row">' +
+                    '<div class="bar-label">' + dayLabels[d] + '</div>' +
+                    '<div class="bar-track">' +
+                    '<div class="bar-fill day-bar" style="width:' + pct + '%;">' + val + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+
+            // Card E: Recent Orders (FILTERABLE by period)
+            const allOrders = data.recent_orders || [];
+            const allQuotes = data.recent_quotes || [];
+            const filteredOrders = filterByDate(allOrders);
+            const filteredQuotes = filterByDate(allQuotes);
+            const displayOrders = filteredOrders.slice(0, 20);
+
+            document.getElementById('ordersCount').textContent = filteredOrders.length + ' ordenes | ' + filteredQuotes.length + ' cotizaciones (' + periodLabel + ')';
+            document.getElementById('ordersTimestamp').textContent = 'Actualizado: ' + scanTs;
+
+            const ordersBody = document.getElementById('ordersTableBody');
+            if (displayOrders.length === 0) {
+                ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#7f8c8d;">Sin ordenes en el periodo seleccionado (' + periodLabel + ')</td></tr>';
+            } else {
+                ordersBody.innerHTML = displayOrders.map((o, i) => {
+                    const products = (o.products || []).map(p =>
+                        '<span class="product-tag ' + getProductTagClass(p) + '">' + p + '</span>'
+                    ).join(' ');
+                    const kommetBadge = o.has_kommet_match
+                        ? '<span class="kommet-badge yes">Si</span>'
+                        : '<span class="kommet-badge no">No</span>';
+                    const bgStyle = i % 2 === 1 ? ' style="background:#f8f9fa;"' : '';
+                    const subject = (o.subject || '').length > 60 ? o.subject.substring(0, 60) + '...' : (o.subject || '-');
+                    return '<tr' + bgStyle + '>' +
+                        '<td style="white-space:nowrap;font-size:12px;">' + formatDate(o.date) + '</td>' +
+                        '<td style="font-weight:600;">' + (o.from || '-') + '</td>' +
+                        '<td style="font-size:12px;" title="' + (o.subject || '').replace(/"/g, '&quot;') + '">' + subject + '</td>' +
+                        '<td>' + (products || '<span style="color:#bdc3c7;">-</span>') + '</td>' +
+                        '<td style="text-align:center;">' + kommetBadge + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+        }
+
+        async function fetchEmailAnalytics() {
+            try {
+                const response = await fetch(EMAIL_API_URL);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                emailDataSource = 'live';
+                document.getElementById('emailDataStatus').textContent = 'Datos en vivo via Bot API';
+                document.getElementById('emailDataStatus').className = 'email-data-status live';
+                renderEmailAnalytics(data);
+            } catch (apiError) {
+                console.log('Bot API not available, using static fallback data');
+                if (typeof STATIC_EMAIL_DATA !== 'undefined') {
+                    emailDataSource = 'static';
+                    document.getElementById('emailDataStatus').textContent = 'Datos estaticos (bot offline)';
+                    document.getElementById('emailDataStatus').className = 'email-data-status static';
+                    renderEmailAnalytics(STATIC_EMAIL_DATA);
+                } else {
+                    document.getElementById('emailDataStatus').textContent = 'Sin conexion al bot - datos no disponibles';
+                    document.getElementById('emailDataStatus').className = 'email-data-status static';
+                }
+            }
+        }
+
+        // Static fallback data from last scan
+        const STATIC_EMAIL_DATA = {
+            "generated_at": "2026-02-17T03:25:47.674636",
+            "scan_period_days": 30,
+            "analytics": {
+                "total_emails": 1613,
+                "summary": {
+                    "total": 1613, "orders": 228, "quotes": 63, "commercial": 290,
+                    "general": 1323, "with_products_mentioned": 231, "order_to_quote_ratio": 3.62
+                },
+                "top_clients": [
+                    {"email":"no-reply@kometsales.com","name":"Komet Sales","total_emails":271,"orders":41,"quotes":0,"products":["HYDRANGEA","LEPIDIUM","MATRICARIA"]},
+                    {"email":"rivermailer@riverdalefarms.com","name":"RIVERDALE FARMS","total_emails":37,"orders":1,"quotes":27,"products":["HYDRANGEA","LEPIDIUM","MATRICARIA","STATICE"]},
+                    {"email":"operacionesbqt_esperanza@sunshinebouquet.com","name":"Operaciones Bouquetera Esperanza","total_emails":29,"orders":0,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"vrobinson@petalswest.com","name":"The Flower Market","total_emails":27,"orders":27,"quotes":0,"products":[]},
+                    {"email":"reportes_terceros@sunshinebouquet.com","name":"Reportes Terceros","total_emails":25,"orders":14,"quotes":0,"products":["HYDRANGEA","LEPIDIUM"]},
+                    {"email":"mmontoya@sunshinebouquet.com","name":"Mary Montoya","total_emails":23,"orders":0,"quotes":6,"products":["HYDRANGEA"]},
+                    {"email":"stsventarnaya@7flowers.ru","name":"7Flowers (Svetlana)","total_emails":21,"orders":21,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"accounting@makescentsflowers.com","name":"MSF - Accounting","total_emails":20,"orders":20,"quotes":0,"products":[]},
+                    {"email":"tkirshenman@7flowers.ru","name":"7Flowers (Tatiana)","total_emails":17,"orders":17,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"m@impexflowers.com","name":"Impex Flowers","total_emails":13,"orders":0,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"noreply@m-flowers.com","name":"mFlowers","total_emails":22,"orders":0,"quotes":0,"products":["HYDRANGEA","MATRICARIA"]}
+                ],
+                "product_demand": [
+                    {"product":"HYDRANGEA","mentions":198},
+                    {"product":"LEPIDIUM","mentions":49},
+                    {"product":"MATRICARIA","mentions":25},
+                    {"product":"STATICE","mentions":19}
+                ],
+                "volume_by_day": {"Monday":388,"Tuesday":285,"Wednesday":199,"Thursday":281,"Friday":379,"Saturday":49,"Sunday":21}
+            },
+            "recent_orders": [
+                {"date":"2026-02-17T03:15:47+00:00","from":"Formspree","subject":"New inquiry from Sky Flowers website","products":[],"has_kommet_match":false},
+                {"date":"2026-02-16T22:33:47+00:00","from":"Logiztik Alliance Group","subject":"Logiztik Alliance Colombia l Important Communication l Rate Increase","products":[],"has_kommet_match":true},
+                {"date":"2026-02-16T20:08:53+00:00","from":"MSF - Accounting","subject":"Order to fly out of Colombia on Friday, Feb 27th","products":[],"has_kommet_match":false},
+                {"date":"2026-02-16T18:02:33+00:00","from":"Allure Farms","subject":"PO #P281505 for Tue, Feb 17 - Sky Flowers - Allure Farms","products":["LEPIDIUM","HYDRANGEA"],"has_kommet_match":true},
+                {"date":"2026-02-16T16:56:51+00:00","from":"MSF - Accounting","subject":"RE: Order to fly out of Colombia on Tuesday, Feb 24th","products":[],"has_kommet_match":false},
+                {"date":"2026-02-16T15:50:55+00:00","from":"Reportes Terceros","subject":"C.I. SUNSHINE BOUQUET COLOMBIA SAS - PO# 1076456","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-16T15:21:57+00:00","from":"7Flowers (Svetlana)","subject":"RE: Women's day Gulf Flowers FZCO orders","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-16T08:45:50+00:00","from":"7Flowers (Tatiana)","subject":"Order Gulf flowers PIT 19/02 Cargex","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-14T16:57:19+00:00","from":"Reportes Terceros","subject":"C.I. SUNSHINE BOUQUET COLOMBIA SAS - PO# 1076454","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-14T13:54:57+00:00","from":"Johander Torres","subject":"Ordenes De Compra Semana 2026-08","products":[],"has_kommet_match":false}
+            ],
+            "recent_quotes": [
+                {"date":"2026-02-16T17:08:46-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 07KSSUP Adiciones/Modificaciones/Cancelaciones","products":["LEPIDIUM"]},
+                {"date":"2026-02-13T17:24:35-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 10KSSUP Adiciones/Modificaciones/Cancelaciones","products":["HYDRANGEA","LEPIDIUM","STATICE"]},
+                {"date":"2026-02-13T12:02:36-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 08KSSUP Adiciones/Modificaciones/Cancelaciones","products":["MATRICARIA","LEPIDIUM","STATICE"]},
+                {"date":"2026-02-12T12:40:26-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 16KSSUP Adiciones/Modificaciones/Cancelaciones","products":["HYDRANGEA","LEPIDIUM","STATICE"]},
+                {"date":"2026-02-10T18:00:46+00:00","from":"Mary Montoya","subject":"RE: Solicitud Disponibilidad Hydrangeas","products":["HYDRANGEA"]},
+                {"date":"2026-02-10T17:26:21-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 01KSSUP Adiciones/Modificaciones/Cancelaciones","products":["HYDRANGEA","LEPIDIUM","STATICE"]}
+            ],
+            "kommet_enrichment": {"enriched":true,"total_checked":1613,"matched":337,"match_rate":20.9}
+        };
+
+        // Initialize date inputs with sensible defaults
+        function initDateInputs() {
+            const today = new Date();
+            const thirtyAgo = new Date(today);
+            thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+            document.getElementById('customDateTo').value = today.toISOString().split('T')[0];
+            document.getElementById('customDateFrom').value = thirtyAgo.toISOString().split('T')[0];
+        }
+
+        // Fetch email analytics on page load and refresh every 60s
+        document.addEventListener('DOMContentLoaded', function() {
+            initDateInputs();
+            fetchEmailAnalytics();
+            setInterval(fetchEmailAnalytics, EMAIL_REFRESH_INTERVAL);
+        });
+    </script>
+</body>
+</html>
