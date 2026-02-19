@@ -663,6 +663,10 @@
                 </div>
             </div>
             <div class="kpi-grid">
+                <div class="kpi-tile" style="border-left-color:#27ae60;">
+                    <div class="kpi-value" id="kpiRevenue">--</div>
+                    <div class="kpi-label">Revenue USD</div>
+                </div>
                 <div class="kpi-tile">
                     <div class="kpi-value" id="kpiStems">--</div>
                     <div class="kpi-label">Tallos Totales</div>
@@ -675,17 +679,21 @@
                     <div class="kpi-value" id="kpiCustomers">--</div>
                     <div class="kpi-label">Clientes Activos</div>
                 </div>
+                <div class="kpi-tile" style="border-left-color:#27ae60;">
+                    <div class="kpi-value" id="kpiAvgRevDay">--</div>
+                    <div class="kpi-label">Prom USD/Dia</div>
+                </div>
                 <div class="kpi-tile">
                     <div class="kpi-value" id="kpiAvgDay">--</div>
                     <div class="kpi-label">Prom Tallos/Dia</div>
                 </div>
+                <div class="kpi-tile" style="border-left-color:#27ae60;">
+                    <div class="kpi-value" id="kpiAvgPrice">--</div>
+                    <div class="kpi-label">Precio Prom/Tallo</div>
+                </div>
                 <div class="kpi-tile">
                     <div class="kpi-value" id="kpiProducts">--</div>
                     <div class="kpi-label">Productos Unicos</div>
-                </div>
-                <div class="kpi-tile">
-                    <div class="kpi-value" id="kpiAPI">--</div>
-                    <div class="kpi-label">API Calls</div>
                 </div>
             </div>
         </div>
@@ -728,11 +736,11 @@
                         <tr>
                             <th>#</th>
                             <th>Cliente</th>
+                            <th style="text-align:right;">Revenue USD</th>
                             <th style="text-align:right;">Tallos</th>
                             <th style="text-align:right;">Facturas</th>
-                            <th style="text-align:right;">Productos</th>
+                            <th style="text-align:right;">Prom USD/Orden</th>
                             <th style="text-align:right;">Frecuencia</th>
-                            <th style="text-align:right;">Prom/Orden</th>
                             <th>Categorias</th>
                         </tr>
                     </thead>
@@ -759,9 +767,9 @@
                             <th>#</th>
                             <th>Producto</th>
                             <th>Categoria</th>
+                            <th style="text-align:right;">Revenue USD</th>
                             <th style="text-align:right;">Tallos</th>
                             <th style="text-align:right;">Clientes</th>
-                            <th style="text-align:right;">Facturas</th>
                         </tr>
                     </thead>
                     <tbody id="productTableBody">
@@ -840,6 +848,10 @@
             return (n || 0).toLocaleString();
         }
 
+        function fmtUSD(n) {
+            return '$' + (n || 0).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+        }
+
         function formatTimestamp(ts) {
             if (!ts) return '-';
             try {
@@ -884,20 +896,16 @@
             const filteredDaily = filterByPeriod(dailyVolume, currentPeriodDays);
 
             // Card A: KPIs
+            document.getElementById('kpiRevenue').textContent = fmtUSD(summary.total_revenue);
             document.getElementById('kpiStems').textContent = fmtNum(summary.total_stems);
             document.getElementById('kpiInvoices').textContent = fmtNum(summary.total_invoices);
             document.getElementById('kpiCustomers').textContent = fmtNum(summary.active_customers);
+            document.getElementById('kpiAvgRevDay').textContent = fmtUSD(summary.avg_revenue_per_day);
             document.getElementById('kpiAvgDay').textContent = fmtNum(summary.avg_stems_per_day);
+            document.getElementById('kpiAvgPrice').textContent = '$' + (summary.avg_price_per_stem || 0).toFixed(2);
             document.getElementById('kpiProducts').textContent = fmtNum(summary.unique_products);
-            document.getElementById('kpiAPI').textContent = (data.api_calls_used || 0) + ' calls';
             document.getElementById('scanInfo').textContent = (data.scan_period_days || 30) + ' dias escaneados';
             document.getElementById('lastUpdate').textContent = 'Actualizado: ' + formatTimestamp(data.generated_at);
-
-            // Quantity/Price flag
-            const qtyFlag = data.has_quantity_data ? '' : ' (conteo items)';
-            if (!data.has_quantity_data) {
-                document.getElementById('kpiStems').title = 'Basado en conteo de line items, no tallos reales';
-            }
 
             // Card B: Category Mix
             renderCategoryMix(byCategory);
@@ -928,15 +936,15 @@
                 container.innerHTML = '<div class="no-data-msg">Sin datos de categorias</div>';
                 return;
             }
-            const maxStems = cats[0].stems || 1;
+            const maxRevenue = Math.max(...cats.map(c => c.revenue || 0), 1);
             container.innerHTML = cats.map(c => {
-                const pct = Math.max(Math.round((c.stems / maxStems) * 100), c.stems > 0 ? 8 : 0);
+                const pct = Math.max(Math.round(((c.revenue || 0) / maxRevenue) * 100), c.revenue > 0 ? 8 : 0);
                 return '<div class="cat-bar-row">' +
                     '<div class="cat-bar-label">' + c.category + '</div>' +
                     '<div class="cat-bar-track">' +
-                    '<div class="cat-bar-fill cat-' + catClass(c.category) + '" style="width:' + pct + '%;">' + c.pct + '%</div>' +
+                    '<div class="cat-bar-fill cat-' + catClass(c.category) + '" style="width:' + pct + '%;">' + (c.revenue_pct || 0) + '%</div>' +
                     '</div>' +
-                    '<div class="cat-bar-count">' + fmtNum(c.stems) + '</div>' +
+                    '<div class="cat-bar-count">' + fmtUSD(c.revenue) + '</div>' +
                     '</div>';
             }).join('');
         }
@@ -949,17 +957,16 @@
                 container.innerHTML = '<div class="no-data-msg">Sin datos de volumen diario</div>';
                 return;
             }
-            const maxStems = Math.max(...daily.map(d => d.stems || 0), 1);
-            // Show most recent first, limit to 14 bars
+            const maxRevenue = Math.max(...daily.map(d => d.revenue || 0), 1);
             const show = daily.slice(0, 14);
             container.innerHTML = show.map(d => {
-                const pct = Math.round(((d.stems || 0) / maxStems) * 100);
+                const pct = Math.round(((d.revenue || 0) / maxRevenue) * 100);
                 return '<div class="daily-bar-row">' +
                     '<div class="daily-date">' + (d.date || '-') + '</div>' +
                     '<div class="daily-track">' +
-                    '<div class="daily-fill" style="width:' + Math.max(pct, d.stems > 0 ? 8 : 0) + '%;">' + fmtNum(d.stems) + '</div>' +
+                    '<div class="daily-fill" style="width:' + Math.max(pct, d.revenue > 0 ? 8 : 0) + '%;">' + fmtUSD(d.revenue) + '</div>' +
                     '</div>' +
-                    '<div class="daily-invoices">' + (d.invoices || 0) + ' fact</div>' +
+                    '<div class="daily-invoices">' + fmtNum(d.stems) + ' tallos</div>' +
                     '</div>';
             }).join('');
         }
@@ -979,11 +986,11 @@
                 return '<tr>' +
                     '<td class="rank-cell">' + (i + 1) + '</td>' +
                     '<td style="font-weight:600;">' + (c.customer || '-') + '</td>' +
-                    '<td style="text-align:right;font-weight:600;">' + fmtNum(c.stems) + '</td>' +
+                    '<td style="text-align:right;font-weight:700;color:#27ae60;">' + fmtUSD(c.revenue) + '</td>' +
+                    '<td style="text-align:right;">' + fmtNum(c.stems) + '</td>' +
                     '<td style="text-align:right;">' + (c.invoices || 0) + '</td>' +
-                    '<td style="text-align:right;">' + (c.products || 0) + '</td>' +
+                    '<td style="text-align:right;font-weight:600;">' + fmtUSD(c.avg_revenue_per_order) + '</td>' +
                     '<td style="text-align:right;">' + (c.frequency || 0) + ' dias</td>' +
-                    '<td style="text-align:right;font-weight:600;">' + fmtNum(c.avg_per_order) + '</td>' +
                     '<td>' + cats + '</td>' +
                     '</tr>';
             }).join('');
@@ -1003,9 +1010,9 @@
                     '<td class="rank-cell">' + (i + 1) + '</td>' +
                     '<td style="font-weight:600;">' + (p.product || '-') + '</td>' +
                     '<td>' + badge + '</td>' +
-                    '<td style="text-align:right;font-weight:600;">' + fmtNum(p.stems) + '</td>' +
+                    '<td style="text-align:right;font-weight:700;color:#27ae60;">' + fmtUSD(p.revenue) + '</td>' +
+                    '<td style="text-align:right;">' + fmtNum(p.stems) + '</td>' +
                     '<td style="text-align:right;">' + (p.customers || 0) + '</td>' +
-                    '<td style="text-align:right;">' + (p.invoices || 0) + '</td>' +
                     '</tr>';
             }).join('');
         }
@@ -1031,7 +1038,7 @@
                 return '<div class="weekly-bar-row">' +
                     '<div class="weekly-label">' + (w.week || '-') + '</div>' +
                     '<div class="weekly-stacked-track" style="max-width:' + barWidthPct + '%;">' + segments + '</div>' +
-                    '<div class="weekly-total">' + fmtNum(w.stems) + '</div>' +
+                    '<div class="weekly-total">' + fmtUSD(w.revenue) + '</div>' +
                     '</div>';
             }).join('');
         }
@@ -1039,11 +1046,10 @@
         // ---- Card G: Concentration ----
         function renderConcentration(conc) {
             const container = document.getElementById('concentrationChart');
-            const top5 = conc.top_5_pct || 0;
-            const top10 = conc.top_10_pct || 0;
+            const top5 = conc.top_5_revenue_pct || conc.top_5_pct || 0;
+            const top10 = conc.top_10_revenue_pct || conc.top_10_pct || 0;
             const totalCust = conc.total_customers || 0;
 
-            // Conic gradient for ring
             const grad = 'conic-gradient(#1abc9c 0% ' + top5 + '%, #a3e4d7 ' + top5 + '% ' + top10 + '%, #ecf0f1 ' + top10 + '% 100%)';
 
             container.innerHTML =
@@ -1056,11 +1062,11 @@
                 '<div class="concentration-stats">' +
                     '<div class="concentration-stat">' +
                         '<div class="concentration-stat-value">' + top5.toFixed(1) + '%</div>' +
-                        '<div class="concentration-stat-label">Top 5 clientes</div>' +
+                        '<div class="concentration-stat-label">Top 5 = % del revenue</div>' +
                     '</div>' +
                     '<div class="concentration-stat">' +
                         '<div class="concentration-stat-value">' + top10.toFixed(1) + '%</div>' +
-                        '<div class="concentration-stat-label">Top 10 clientes</div>' +
+                        '<div class="concentration-stat-label">Top 10 = % del revenue</div>' +
                     '</div>' +
                 '</div>';
         }
