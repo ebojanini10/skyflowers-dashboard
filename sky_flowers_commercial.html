@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Flowers - Commercial Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d9488 0%, #115e59 50%, #064e3b 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* ============================================================ */
+        /* HEADER                                                        */
+        /* ============================================================ */
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #1abc9c, #16a085);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .company-details h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .company-details p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .period-filter {
+            display: flex;
+            gap: 4px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            padding: 3px;
+        }
+
+        .period-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn.active {
+            background: #1abc9c;
+            color: white;
+        }
+
+        .period-btn:hover:not(.active) {
+            background: rgba(26, 188, 156, 0.15);
+            color: #16a085;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline { background: #e74c3c; animation: none; }
+        .status-indicator.static { background: #f39c12; }
+
+        .last-update {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* ============================================================ */
+        /* GRID LAYOUT                                                    */
+        /* ============================================================ */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .full-width { grid-column: 1 / -1; }
+        .half-width { grid-column: span 1; }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon { font-size: 20px; }
+
+        .card-badge {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 400;
+        }
+
+        /* ============================================================ */
+        /* CARD A: KPI TILES                                              */
+        /* ============================================================ */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 14px;
+        }
+
+        .kpi-tile {
+            background: linear-gradient(135deg, #f8f9fa, #ecf0f1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border-left: 4px solid #1abc9c;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2c3e50;
+            line-height: 1.1;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================================ */
+        /* CARD B: CATEGORY MIX BARS                                      */
+        /* ============================================================ */
+        .cat-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cat-bar-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .cat-bar-track {
+            flex: 1;
+            height: 22px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .cat-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.8s ease;
+            min-width: 30px;
+        }
+
+        .cat-bar-count {
+            font-size: 12px;
+            color: #7f8c8d;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* Category colors */
+        .cat-hydrangea { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .cat-lepidium { background: linear-gradient(90deg, #e67e22, #f39c12); }
+        .cat-matricaria { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+        .cat-sunflower { background: linear-gradient(90deg, #f1c40f, #f39c12); }
+        .cat-bouquets { background: linear-gradient(90deg, #9b59b6, #8e44ad); }
+        .cat-combos { background: linear-gradient(90deg, #3498db, #2980b9); }
+        .cat-follajes { background: linear-gradient(90deg, #1abc9c, #16a085); }
+        .cat-other { background: linear-gradient(90deg, #95a5a6, #7f8c8d); }
+
+        /* ============================================================ */
+        /* CARD C: DAILY VOLUME BARS                                      */
+        /* ============================================================ */
+        .daily-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .daily-date {
+            font-size: 11px;
+            color: #7f8c8d;
+            min-width: 72px;
+            text-align: right;
+        }
+
+        .daily-track {
+            flex: 1;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .daily-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #1abc9c, #16a085);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.8s ease;
+            min-width: 24px;
+        }
+
+        .daily-invoices {
+            font-size: 11px;
+            color: #7f8c8d;
+            min-width: 40px;
+        }
+
+        /* ============================================================ */
+        /* CARD D & E: TABLES                                              */
+        /* ============================================================ */
+        .commercial-table-wrap {
+            max-height: 420px;
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+
+        .commercial-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .commercial-table thead tr {
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .commercial-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .commercial-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .commercial-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .commercial-table tbody tr:hover {
+            background: rgba(26, 188, 156, 0.08);
+        }
+
+        .rank-cell {
+            font-weight: 700;
+            color: #1abc9c;
+            text-align: center;
+        }
+
+        /* Category badges */
+        .cat-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .cat-badge.hydrangea { background: #e8f5e9; color: #2e7d32; }
+        .cat-badge.lepidium { background: #fff3e0; color: #e65100; }
+        .cat-badge.matricaria { background: #fce4ec; color: #c62828; }
+        .cat-badge.sunflower { background: #fffde7; color: #f57f17; }
+        .cat-badge.bouquets { background: #f3e5f5; color: #7b1fa2; }
+        .cat-badge.combos { background: #e3f2fd; color: #1565c0; }
+        .cat-badge.follajes { background: #e0f2f1; color: #00695c; }
+        .cat-badge.other { background: #ecf0f1; color: #7f8c8d; }
+
+        /* ============================================================ */
+        /* CARD F: WEEKLY STACKED BARS                                    */
+        /* ============================================================ */
+        .weekly-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .weekly-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .weekly-stacked-track {
+            flex: 1;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .weekly-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.8s ease;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .weekly-total {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 60px;
+            text-align: right;
+        }
+
+        /* ============================================================ */
+        /* CARD G: CONCENTRATION                                          */
+        /* ============================================================ */
+        .concentration-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .concentration-ring {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .concentration-ring-inner {
+            width: 90px;
+            height: 90px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .concentration-ring-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .concentration-ring-label {
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+
+        .concentration-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .concentration-stat {
+            padding: 10px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #1abc9c;
+        }
+
+        .concentration-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .concentration-stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        /* ============================================================ */
+        /* CARD H: VARIETIES COLLAPSIBLE                                  */
+        /* ============================================================ */
+        .variety-section {
+            margin-bottom: 8px;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .variety-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .variety-header:hover {
+            background: #ecf0f1;
+        }
+
+        .variety-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .variety-toggle {
+            font-size: 12px;
+            color: #7f8c8d;
+            transition: transform 0.2s;
+        }
+
+        .variety-toggle.open {
+            transform: rotate(90deg);
+        }
+
+        .variety-body {
+            display: none;
+            padding: 8px 14px;
+        }
+
+        .variety-body.open {
+            display: block;
+        }
+
+        .variety-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 12px;
+        }
+
+        .variety-item-name {
+            flex: 1;
+            color: #2c3e50;
+        }
+
+        .variety-item-stems {
+            font-weight: 600;
+            color: #1abc9c;
+        }
+
+        /* ============================================================ */
+        /* DATA SOURCE INDICATOR                                          */
+        /* ============================================================ */
+        .data-source {
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            background: #e8f5e9;
+            color: #27ae60;
+        }
+
+        .no-data-msg {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 30px;
+            font-size: 14px;
+        }
+
+        /* ============================================================ */
+        /* RESPONSIVE                                                      */
+        /* ============================================================ */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            .half-width {
+                grid-column: span 1;
+            }
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .concentration-wrapper {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- HEADER                                                         -->
+    <!-- ============================================================ -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="company-info">
+                <div class="company-logo">SF</div>
+                <div class="company-details">
+                    <h1>Sky Flowers - Commercial Dashboard</h1>
+                    <p>Komet Sales Analytics | La Ceja, Antioquia</p>
+                </div>
+            </div>
+            <div class="header-controls">
+                <div class="period-filter">
+                    <button class="period-btn" data-days="7" onclick="setPeriod(7)">7d</button>
+                    <button class="period-btn" data-days="15" onclick="setPeriod(15)">15d</button>
+                    <button class="period-btn active" data-days="30" onclick="setPeriod(30)">30d</button>
+                </div>
+                <div class="system-status">
+                    <div class="status-indicator" id="statusDot"></div>
+                    <div>
+                        <div class="last-update" id="dataStatus">Conectando...</div>
+                        <div class="last-update" id="lastUpdate"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- DASHBOARD GRID                                                  -->
+    <!-- ============================================================ -->
+    <div class="dashboard-container">
+
+        <!-- Card A: Resumen Comercial -->
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">A</span>
+                    Resumen Comercial
+                </div>
+                <div>
+                    <span class="card-badge" id="scanInfo"></span>
+                    <span class="data-source" id="dataSourceBadge">--</span>
+                </div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi-tile">
+                    <div class="kpi-value" id="kpiStems">--</div>
+                    <div class="kpi-label">Tallos Totales</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-value" id="kpiInvoices">--</div>
+                    <div class="kpi-label">Facturas</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-value" id="kpiCustomers">--</div>
+                    <div class="kpi-label">Clientes Activos</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-value" id="kpiAvgDay">--</div>
+                    <div class="kpi-label">Prom Tallos/Dia</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-value" id="kpiProducts">--</div>
+                    <div class="kpi-label">Productos Unicos</div>
+                </div>
+                <div class="kpi-tile">
+                    <div class="kpi-value" id="kpiAPI">--</div>
+                    <div class="kpi-label">API Calls</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card B: Mix por Categoria -->
+        <div class="dashboard-card half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">B</span>
+                    Mix por Categoria
+                </div>
+            </div>
+            <div id="categoryChart"><div class="no-data-msg">Cargando...</div></div>
+        </div>
+
+        <!-- Card C: Tendencia Diaria -->
+        <div class="dashboard-card half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">C</span>
+                    Tendencia Diaria
+                </div>
+                <span class="card-badge" id="dailyPeriodLabel"></span>
+            </div>
+            <div id="dailyChart"><div class="no-data-msg">Cargando...</div></div>
+        </div>
+
+        <!-- Card D: Top 10 Clientes -->
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">D</span>
+                    Top 10 Clientes
+                </div>
+                <span class="card-badge" id="clientCount"></span>
+            </div>
+            <div class="commercial-table-wrap">
+                <table class="commercial-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th style="text-align:right;">Tallos</th>
+                            <th style="text-align:right;">Facturas</th>
+                            <th style="text-align:right;">Productos</th>
+                            <th style="text-align:right;">Frecuencia</th>
+                            <th style="text-align:right;">Prom/Orden</th>
+                            <th>Categorias</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientTableBody">
+                        <tr><td colspan="8" class="no-data-msg">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Card E: Top 15 Productos -->
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">E</span>
+                    Top 15 Productos
+                </div>
+                <span class="card-badge" id="productCount"></span>
+            </div>
+            <div class="commercial-table-wrap">
+                <table class="commercial-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Producto</th>
+                            <th>Categoria</th>
+                            <th style="text-align:right;">Tallos</th>
+                            <th style="text-align:right;">Clientes</th>
+                            <th style="text-align:right;">Facturas</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <tr><td colspan="6" class="no-data-msg">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Card F: Mix Semanal -->
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">F</span>
+                    Mix Semanal por Categoria
+                </div>
+            </div>
+            <div id="weeklyChart"><div class="no-data-msg">Cargando...</div></div>
+        </div>
+
+        <!-- Card G: Concentracion de Clientes -->
+        <div class="dashboard-card half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">G</span>
+                    Concentracion de Clientes
+                </div>
+            </div>
+            <div class="concentration-wrapper" id="concentrationChart">
+                <div class="no-data-msg">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- Card H: Variedades Top por Categoria -->
+        <div class="dashboard-card half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">H</span>
+                    Variedades Top por Categoria
+                </div>
+            </div>
+            <div id="varietiesContainer"><div class="no-data-msg">Cargando...</div></div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- JAVASCRIPT                                                      -->
+    <!-- ============================================================ -->
+    <script>
+        const API_URL = 'http://localhost:5000/commercial-data';
+        let currentPeriodDays = 30;
+        let cachedData = null;
+
+        // Category color map (CSS class suffix)
+        const CAT_COLORS = {
+            'HYDRANGEA': '#27ae60',
+            'LEPIDIUM':  '#e67e22',
+            'MATRICARIA':'#e74c3c',
+            'SUNFLOWER': '#f1c40f',
+            'BOUQUETS':  '#9b59b6',
+            'COMBOS':    '#3498db',
+            'FOLLAJES':  '#1abc9c',
+            'OTHER':     '#95a5a6',
+        };
+
+        function catClass(cat) {
+            return (cat || 'other').toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function catColor(cat) {
+            return CAT_COLORS[cat] || CAT_COLORS['OTHER'];
+        }
+
+        function fmtNum(n) {
+            return (n || 0).toLocaleString();
+        }
+
+        function formatTimestamp(ts) {
+            if (!ts) return '-';
+            try {
+                const d = new Date(ts);
+                return d.toLocaleString('es-CO', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+            } catch(e) { return ts; }
+        }
+
+        // ============================================================
+        // Period filter
+        // ============================================================
+        function setPeriod(days) {
+            currentPeriodDays = days;
+            document.querySelectorAll('.period-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.days) === days);
+            });
+            if (cachedData) renderDashboard(cachedData);
+        }
+
+        function filterByPeriod(dailyVolume, days) {
+            if (!dailyVolume || !dailyVolume.length) return [];
+            // daily_volume is sorted descending by date
+            const cutoff = new Date();
+            cutoff.setDate(cutoff.getDate() - days);
+            const cutoffStr = cutoff.toISOString().slice(0, 10);
+            return dailyVolume.filter(d => d.date >= cutoffStr);
+        }
+
+        // ============================================================
+        // RENDER
+        // ============================================================
+        function renderDashboard(data) {
+            const summary = data.summary || {};
+            const byCategory = data.by_category || [];
+            const byCustomer = data.by_customer || [];
+            const byProduct = data.by_product || [];
+            const dailyVolume = data.daily_volume || [];
+            const weeklyVolume = data.weekly_volume || [];
+            const concentration = data.customer_concentration || {};
+            const varieties = data.varieties_by_category || {};
+
+            const filteredDaily = filterByPeriod(dailyVolume, currentPeriodDays);
+
+            // Card A: KPIs
+            document.getElementById('kpiStems').textContent = fmtNum(summary.total_stems);
+            document.getElementById('kpiInvoices').textContent = fmtNum(summary.total_invoices);
+            document.getElementById('kpiCustomers').textContent = fmtNum(summary.active_customers);
+            document.getElementById('kpiAvgDay').textContent = fmtNum(summary.avg_stems_per_day);
+            document.getElementById('kpiProducts').textContent = fmtNum(summary.unique_products);
+            document.getElementById('kpiAPI').textContent = (data.api_calls_used || 0) + ' calls';
+            document.getElementById('scanInfo').textContent = (data.scan_period_days || 30) + ' dias escaneados';
+            document.getElementById('lastUpdate').textContent = 'Actualizado: ' + formatTimestamp(data.generated_at);
+
+            // Quantity/Price flag
+            const qtyFlag = data.has_quantity_data ? '' : ' (conteo items)';
+            if (!data.has_quantity_data) {
+                document.getElementById('kpiStems').title = 'Basado en conteo de line items, no tallos reales';
+            }
+
+            // Card B: Category Mix
+            renderCategoryMix(byCategory);
+
+            // Card C: Daily Volume
+            renderDailyVolume(filteredDaily);
+
+            // Card D: Top 10 Clients
+            renderClientTable(byCustomer.slice(0, 10));
+
+            // Card E: Top 15 Products
+            renderProductTable(byProduct.slice(0, 15));
+
+            // Card F: Weekly Mix
+            renderWeeklyMix(weeklyVolume);
+
+            // Card G: Concentration
+            renderConcentration(concentration);
+
+            // Card H: Varieties
+            renderVarieties(varieties);
+        }
+
+        // ---- Card B: Category Mix ----
+        function renderCategoryMix(cats) {
+            const container = document.getElementById('categoryChart');
+            if (!cats.length) {
+                container.innerHTML = '<div class="no-data-msg">Sin datos de categorias</div>';
+                return;
+            }
+            const maxStems = cats[0].stems || 1;
+            container.innerHTML = cats.map(c => {
+                const pct = Math.max(Math.round((c.stems / maxStems) * 100), c.stems > 0 ? 8 : 0);
+                return '<div class="cat-bar-row">' +
+                    '<div class="cat-bar-label">' + c.category + '</div>' +
+                    '<div class="cat-bar-track">' +
+                    '<div class="cat-bar-fill cat-' + catClass(c.category) + '" style="width:' + pct + '%;">' + c.pct + '%</div>' +
+                    '</div>' +
+                    '<div class="cat-bar-count">' + fmtNum(c.stems) + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // ---- Card C: Daily Volume ----
+        function renderDailyVolume(daily) {
+            const container = document.getElementById('dailyChart');
+            document.getElementById('dailyPeriodLabel').textContent = 'Ultimos ' + currentPeriodDays + ' dias';
+            if (!daily.length) {
+                container.innerHTML = '<div class="no-data-msg">Sin datos de volumen diario</div>';
+                return;
+            }
+            const maxStems = Math.max(...daily.map(d => d.stems || 0), 1);
+            // Show most recent first, limit to 14 bars
+            const show = daily.slice(0, 14);
+            container.innerHTML = show.map(d => {
+                const pct = Math.round(((d.stems || 0) / maxStems) * 100);
+                return '<div class="daily-bar-row">' +
+                    '<div class="daily-date">' + (d.date || '-') + '</div>' +
+                    '<div class="daily-track">' +
+                    '<div class="daily-fill" style="width:' + Math.max(pct, d.stems > 0 ? 8 : 0) + '%;">' + fmtNum(d.stems) + '</div>' +
+                    '</div>' +
+                    '<div class="daily-invoices">' + (d.invoices || 0) + ' fact</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // ---- Card D: Client Table ----
+        function renderClientTable(clients) {
+            const body = document.getElementById('clientTableBody');
+            document.getElementById('clientCount').textContent = clients.length + ' clientes';
+            if (!clients.length) {
+                body.innerHTML = '<tr><td colspan="8" class="no-data-msg">Sin datos de clientes</td></tr>';
+                return;
+            }
+            body.innerHTML = clients.map((c, i) => {
+                const cats = (c.categories || []).map(cat =>
+                    '<span class="cat-badge ' + catClass(cat) + '">' + cat + '</span>'
+                ).join(' ');
+                return '<tr>' +
+                    '<td class="rank-cell">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:600;">' + (c.customer || '-') + '</td>' +
+                    '<td style="text-align:right;font-weight:600;">' + fmtNum(c.stems) + '</td>' +
+                    '<td style="text-align:right;">' + (c.invoices || 0) + '</td>' +
+                    '<td style="text-align:right;">' + (c.products || 0) + '</td>' +
+                    '<td style="text-align:right;">' + (c.frequency || 0) + ' dias</td>' +
+                    '<td style="text-align:right;font-weight:600;">' + fmtNum(c.avg_per_order) + '</td>' +
+                    '<td>' + cats + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        // ---- Card E: Product Table ----
+        function renderProductTable(products) {
+            const body = document.getElementById('productTableBody');
+            document.getElementById('productCount').textContent = products.length + ' productos';
+            if (!products.length) {
+                body.innerHTML = '<tr><td colspan="6" class="no-data-msg">Sin datos de productos</td></tr>';
+                return;
+            }
+            body.innerHTML = products.map((p, i) => {
+                const badge = '<span class="cat-badge ' + catClass(p.category) + '">' + (p.category || '-') + '</span>';
+                return '<tr>' +
+                    '<td class="rank-cell">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:600;">' + (p.product || '-') + '</td>' +
+                    '<td>' + badge + '</td>' +
+                    '<td style="text-align:right;font-weight:600;">' + fmtNum(p.stems) + '</td>' +
+                    '<td style="text-align:right;">' + (p.customers || 0) + '</td>' +
+                    '<td style="text-align:right;">' + (p.invoices || 0) + '</td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        // ---- Card F: Weekly Stacked Bars ----
+        function renderWeeklyMix(weeks) {
+            const container = document.getElementById('weeklyChart');
+            if (!weeks.length) {
+                container.innerHTML = '<div class="no-data-msg">Sin datos semanales</div>';
+                return;
+            }
+            const maxStems = Math.max(...weeks.map(w => w.stems || 0), 1);
+            container.innerHTML = weeks.slice(0, 8).map(w => {
+                const byCat = w.by_category || {};
+                const wTotal = w.stems || 1;
+                const segments = Object.entries(byCat).map(([cat, stems]) => {
+                    const segPct = Math.max((stems / wTotal) * 100, 2);
+                    return '<div class="weekly-segment" style="width:' + segPct + '%;background:' + catColor(cat) + ';" title="' + cat + ': ' + fmtNum(stems) + '">' +
+                        (segPct > 10 ? cat.slice(0, 3) : '') +
+                        '</div>';
+                }).join('');
+                const barWidthPct = Math.max(Math.round((w.stems / maxStems) * 100), 10);
+                return '<div class="weekly-bar-row">' +
+                    '<div class="weekly-label">' + (w.week || '-') + '</div>' +
+                    '<div class="weekly-stacked-track" style="max-width:' + barWidthPct + '%;">' + segments + '</div>' +
+                    '<div class="weekly-total">' + fmtNum(w.stems) + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        // ---- Card G: Concentration ----
+        function renderConcentration(conc) {
+            const container = document.getElementById('concentrationChart');
+            const top5 = conc.top_5_pct || 0;
+            const top10 = conc.top_10_pct || 0;
+            const totalCust = conc.total_customers || 0;
+
+            // Conic gradient for ring
+            const grad = 'conic-gradient(#1abc9c 0% ' + top5 + '%, #a3e4d7 ' + top5 + '% ' + top10 + '%, #ecf0f1 ' + top10 + '% 100%)';
+
+            container.innerHTML =
+                '<div class="concentration-ring" style="background:' + grad + ';">' +
+                    '<div class="concentration-ring-inner">' +
+                        '<div class="concentration-ring-value">' + totalCust + '</div>' +
+                        '<div class="concentration-ring-label">clientes</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="concentration-stats">' +
+                    '<div class="concentration-stat">' +
+                        '<div class="concentration-stat-value">' + top5.toFixed(1) + '%</div>' +
+                        '<div class="concentration-stat-label">Top 5 clientes</div>' +
+                    '</div>' +
+                    '<div class="concentration-stat">' +
+                        '<div class="concentration-stat-value">' + top10.toFixed(1) + '%</div>' +
+                        '<div class="concentration-stat-label">Top 10 clientes</div>' +
+                    '</div>' +
+                '</div>';
+        }
+
+        // ---- Card H: Varieties ----
+        function renderVarieties(varieties) {
+            const container = document.getElementById('varietiesContainer');
+            const cats = Object.keys(varieties);
+            if (!cats.length) {
+                container.innerHTML = '<div class="no-data-msg">Sin datos de variedades</div>';
+                return;
+            }
+            container.innerHTML = cats.map(cat => {
+                const vars = varieties[cat] || [];
+                if (!vars.length) return '';
+                const items = vars.map(v =>
+                    '<div class="variety-item">' +
+                        '<div class="variety-item-name">' + v.variety + '</div>' +
+                        '<div class="variety-item-stems">' + fmtNum(v.stems) + '</div>' +
+                    '</div>'
+                ).join('');
+                return '<div class="variety-section">' +
+                    '<div class="variety-header" onclick="toggleVariety(this)">' +
+                        '<div class="variety-header-left">' +
+                            '<span class="variety-toggle">&#9654;</span>' +
+                            '<span class="cat-badge ' + catClass(cat) + '">' + cat + '</span>' +
+                            '<span style="font-size:12px;color:#7f8c8d;">' + vars.length + ' variedades</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="variety-body">' + items + '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function toggleVariety(header) {
+            const toggle = header.querySelector('.variety-toggle');
+            const body = header.nextElementSibling;
+            toggle.classList.toggle('open');
+            body.classList.toggle('open');
+        }
+
+        // ============================================================
+        // FETCH LOOP
+        // ============================================================
+        async function fetchCommercialData() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                if (data.status === 'error') throw new Error(data.message || 'Error');
+
+                cachedData = data;
+
+                document.getElementById('statusDot').className = 'status-indicator';
+                document.getElementById('dataStatus').textContent = 'En vivo via Bot API';
+                document.getElementById('dataStatus').style.color = '#27ae60';
+                document.getElementById('dataSourceBadge').textContent = 'LIVE';
+                document.getElementById('dataSourceBadge').style.background = '#e8f5e9';
+                document.getElementById('dataSourceBadge').style.color = '#27ae60';
+
+                renderDashboard(data);
+            } catch (err) {
+                console.log('Commercial API not available:', err.message);
+                document.getElementById('statusDot').className = 'status-indicator offline';
+                document.getElementById('dataStatus').textContent = 'Sin conexion - ejecutar scanner';
+                document.getElementById('dataStatus').style.color = '#e74c3c';
+                document.getElementById('dataSourceBadge').textContent = 'OFFLINE';
+                document.getElementById('dataSourceBadge').style.background = '#fce4ec';
+                document.getElementById('dataSourceBadge').style.color = '#e74c3c';
+            }
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchCommercialData();
+            setInterval(fetchCommercialData, 60000);
+        });
+    </script>
+</body>
+</html>
