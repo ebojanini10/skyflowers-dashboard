@@ -596,6 +596,157 @@
         }
 
         /* ============================================================ */
+        /* CARD I: INVOICE STATUS                                         */
+        /* ============================================================ */
+        .status-chart-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .status-donut {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-donut-inner {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status-donut-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .status-donut-label {
+            font-size: 9px;
+            color: #7f8c8d;
+        }
+
+        .status-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .status-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .status-legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .status-legend-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .status-legend-count {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .status-legend-name {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+
+        .status-legend-revenue {
+            font-size: 12px;
+            font-weight: 600;
+            color: #27ae60;
+            margin-left: auto;
+        }
+
+        /* ============================================================ */
+        /* CARD J: CANCELLED ORDERS                                       */
+        /* ============================================================ */
+        .cancelled-summary {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .cancelled-kpi {
+            flex: 1;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #fce4ec, #ffebee);
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            text-align: center;
+        }
+
+        .cancelled-kpi-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #c62828;
+        }
+
+        .cancelled-kpi-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .cancelled-customer-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            background: #f8f9fa;
+        }
+
+        .cancelled-customer-row:hover {
+            background: #fce4ec;
+        }
+
+        .cancelled-customer-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .cancelled-customer-count {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e74c3c;
+            min-width: 30px;
+            text-align: center;
+            background: #ffebee;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* ============================================================ */
         /* RESPONSIVE                                                      */
         /* ============================================================ */
         @media (max-width: 768px) {
@@ -814,6 +965,32 @@
             <div id="varietiesContainer"><div class="no-data-msg">Cargando...</div></div>
         </div>
 
+        <!-- Card I: Estado de Facturacion -->
+        <div class="dashboard-card half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">I</span>
+                    Estado de Facturacion
+                </div>
+                <span class="card-badge" id="totalInvoiceHeaders"></span>
+            </div>
+            <div class="status-chart-wrapper" id="invoiceStatusChart">
+                <div class="no-data-msg">Cargando...</div>
+            </div>
+        </div>
+
+        <!-- Card J: Cancelaciones / Creditos -->
+        <div class="dashboard-card half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">J</span>
+                    Cancelaciones / Creditos
+                </div>
+                <span class="card-badge" id="cancelledBadge" style="background:#fce4ec;color:#c62828;"></span>
+            </div>
+            <div id="cancelledContainer"><div class="no-data-msg">Cargando...</div></div>
+        </div>
+
     </div>
 
     <!-- ============================================================ -->
@@ -927,6 +1104,12 @@
 
             // Card H: Varieties
             renderVarieties(varieties);
+
+            // Card I: Invoice Status
+            renderInvoiceStatus(data.invoice_status || []);
+
+            // Card J: Cancelled Orders
+            renderCancelled(data.cancelled_total || 0, data.cancelled_by_customer || []);
         }
 
         // ---- Card B: Category Mix ----
@@ -1106,6 +1289,91 @@
             const body = header.nextElementSibling;
             toggle.classList.toggle('open');
             body.classList.toggle('open');
+        }
+
+        // ---- Card I: Invoice Status ----
+        function renderInvoiceStatus(statuses) {
+            const container = document.getElementById('invoiceStatusChart');
+            if (!statuses.length) {
+                container.innerHTML = '<div class="no-data-msg">Sin datos de estado</div>';
+                return;
+            }
+
+            const total = statuses.reduce((s, d) => s + d.count, 0);
+            document.getElementById('totalInvoiceHeaders').textContent = total + ' facturas totales';
+
+            const statusColors = {
+                'Confirmada': '#27ae60',
+                'Cancelada': '#e74c3c',
+                'Abierta': '#f39c12',
+            };
+
+            // Build conic gradient
+            let gradParts = [];
+            let cumPct = 0;
+            statuses.forEach(s => {
+                const pct = (s.count / total) * 100;
+                const color = statusColors[s.status] || '#95a5a6';
+                gradParts.push(color + ' ' + cumPct + '% ' + (cumPct + pct) + '%');
+                cumPct += pct;
+            });
+            const grad = 'conic-gradient(' + gradParts.join(', ') + ')';
+
+            const legend = statuses.map(s => {
+                const color = statusColors[s.status] || '#95a5a6';
+                const pct = ((s.count / total) * 100).toFixed(1);
+                return '<div class="status-legend-item">' +
+                    '<div class="status-legend-dot" style="background:' + color + ';"></div>' +
+                    '<div class="status-legend-info">' +
+                        '<div class="status-legend-count">' + s.count + ' <span style="font-size:11px;font-weight:400;color:#7f8c8d;">(' + pct + '%)</span></div>' +
+                        '<div class="status-legend-name">' + s.status + '</div>' +
+                    '</div>' +
+                    '<div class="status-legend-revenue">' + fmtUSD(s.total) + '</div>' +
+                    '</div>';
+            }).join('');
+
+            container.innerHTML =
+                '<div class="status-donut" style="background:' + grad + ';">' +
+                    '<div class="status-donut-inner">' +
+                        '<div class="status-donut-value">' + total + '</div>' +
+                        '<div class="status-donut-label">facturas</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="status-legend">' + legend + '</div>';
+        }
+
+        // ---- Card J: Cancelled Orders ----
+        function renderCancelled(totalCancelled, byCustomer) {
+            const container = document.getElementById('cancelledContainer');
+            const badge = document.getElementById('cancelledBadge');
+            badge.textContent = totalCancelled + ' canceladas';
+
+            if (!totalCancelled) {
+                container.innerHTML = '<div class="no-data-msg">Sin ordenes canceladas en el periodo</div>';
+                return;
+            }
+
+            const summaryHTML = '<div class="cancelled-summary">' +
+                '<div class="cancelled-kpi">' +
+                    '<div class="cancelled-kpi-value">' + totalCancelled + '</div>' +
+                    '<div class="cancelled-kpi-label">Ordenes Canceladas</div>' +
+                '</div>' +
+                '<div class="cancelled-kpi">' +
+                    '<div class="cancelled-kpi-value">' + byCustomer.length + '</div>' +
+                    '<div class="cancelled-kpi-label">Clientes Afectados</div>' +
+                '</div>' +
+                '</div>';
+
+            const customersHTML = byCustomer.slice(0, 10).map(c =>
+                '<div class="cancelled-customer-row">' +
+                    '<div class="cancelled-customer-name">' + c.customer + '</div>' +
+                    '<div class="cancelled-customer-count">' + c.count + '</div>' +
+                '</div>'
+            ).join('');
+
+            container.innerHTML = summaryHTML +
+                '<div style="font-size:12px;font-weight:600;color:#7f8c8d;margin-bottom:8px;">Por Cliente:</div>' +
+                customersHTML;
         }
 
         // ============================================================
