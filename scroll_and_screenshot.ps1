@@ -12,7 +12,7 @@ $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
 $bitmap = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
 $graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bitmap.Save('C:\Users\Eboja\skyflowers-dashboard\commercial_screenshot_2.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bitmap.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\commercial_screenshot_2.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $graphics.Dispose()
 $bitmap.Dispose()
 Write-Output "Screenshot 2 saved"
@@ -24,7 +24,7 @@ Start-Sleep -Seconds 2
 $bitmap2 = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $graphics2 = [System.Drawing.Graphics]::FromImage($bitmap2)
 $graphics2.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bitmap2.Save('C:\Users\Eboja\skyflowers-dashboard\commercial_screenshot_3.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bitmap2.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\commercial_screenshot_3.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $graphics2.Dispose()
 $bitmap2.Dispose()
 Write-Output "Screenshot 3 saved"
@@ -36,7 +36,7 @@ Start-Sleep -Seconds 2
 $bitmap3 = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $graphics3 = [System.Drawing.Graphics]::FromImage($bitmap3)
 $graphics3.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bitmap3.Save('C:\Users\Eboja\skyflowers-dashboard\commercial_screenshot_4.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bitmap3.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\commercial_screenshot_4.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $graphics3.Dispose()
 $bitmap3.Dispose()
 Write-Output "Screenshot 4 saved"
@@ -48,7 +48,7 @@ Start-Sleep -Seconds 2
 $bitmap4 = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $graphics4 = [System.Drawing.Graphics]::FromImage($bitmap4)
 $graphics4.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bitmap4.Save('C:\Users\Eboja\skyflowers-dashboard\commercial_screenshot_5.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bitmap4.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\commercial_screenshot_5.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $graphics4.Dispose()
 $bitmap4.Dispose()
 Write-Output "Screenshot 5 saved"

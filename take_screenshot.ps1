@@ -5,7 +5,7 @@ $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
 $bitmap = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
 $graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$savePath = 'C:\Users\Eboja\skyflowers-dashboard\commercial_dashboard_screenshot.png'
+$savePath = 'C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\commercial_dashboard_screenshot.png'
 $bitmap.Save($savePath, [System.Drawing.Imaging.ImageFormat]::Png)
 $graphics.Dispose()
 $bitmap.Dispose()

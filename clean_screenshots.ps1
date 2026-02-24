@@ -11,7 +11,7 @@ Start-Sleep -Seconds 2
 Start-Sleep -Seconds 1
 
 # Open the dashboard
-Start-Process "C:\Users\Eboja\skyflowers-dashboard\sky_flowers_commercial.html"
+Start-Process "C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\sky_flowers_commercial.html"
 Start-Sleep -Seconds 5
 
 # Click in the middle of the page to make sure the browser has focus
@@ -25,7 +25,7 @@ $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bmp.Save('C:\Users\Eboja\skyflowers-dashboard\final_1.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\final_1.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output "Final 1 saved"
 
@@ -36,7 +36,7 @@ Start-Sleep -Seconds 1
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bmp.Save('C:\Users\Eboja\skyflowers-dashboard\final_2.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\final_2.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output "Final 2 saved"
 
@@ -46,7 +46,7 @@ Start-Sleep -Seconds 1
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bmp.Save('C:\Users\Eboja\skyflowers-dashboard\final_3.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\final_3.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output "Final 3 saved"
 
@@ -56,7 +56,7 @@ Start-Sleep -Seconds 1
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bmp.Save('C:\Users\Eboja\skyflowers-dashboard\final_4.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\final_4.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output "Final 4 saved"
 
@@ -66,7 +66,7 @@ Start-Sleep -Seconds 1
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bmp.Save('C:\Users\Eboja\skyflowers-dashboard\final_5.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\final_5.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output "Final 5 saved"
 
@@ -76,6 +76,6 @@ Start-Sleep -Seconds 1
 $bmp = New-Object System.Drawing.Bitmap($screen.Width, $screen.Height)
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size)
-$bmp.Save('C:\Users\Eboja\skyflowers-dashboard\final_6.png', [System.Drawing.Imaging.ImageFormat]::Png)
+$bmp.Save('C:\Users\Eboja\clients\sky-flowers\skyflowers-dashboard\final_6.png', [System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose(); $bmp.Dispose()
 Write-Output "Final 6 saved"
