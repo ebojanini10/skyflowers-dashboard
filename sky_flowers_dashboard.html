@@ -821,6 +821,14 @@
         .awb-scroll {
             max-height: 420px;
             overflow-y: auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 768px) {
+            .awb-table {
+                min-width: 800px;
+            }
         }
 
         .awb-pipeline-bar {
@@ -956,6 +964,80 @@
                 min-width: 60px;
                 font-size: 11px;
             }
+        }
+
+        /* Production Intelligence Styles */
+        .prod-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(230, 126, 34, 0.95), rgba(211, 84, 0, 0.95));
+            border-radius: 16px;
+            padding: 20px 28px;
+            color: white;
+        }
+        .prod-section-header h2 { font-size: 20px; margin-bottom: 4px; }
+        .prod-section-header p { font-size: 13px; opacity: 0.9; }
+        .prod-full-width { grid-column: 1 / -1; }
+        .prod-half-width { grid-column: span 1; }
+        @media (min-width: 769px) {
+            .prod-half-width { grid-column: span 1; }
+        }
+        .prod-data-status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .prod-data-status.live {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+        .prod-data-status.cached {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+        }
+        .prod-data-status.fallback {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        .prod-alert-card {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+            border-left: 4px solid #e74c3c;
+            font-size: 13px;
+        }
+        .prod-week-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .prod-week-label {
+            min-width: 80px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .prod-week-track {
+            flex: 1;
+            height: 22px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .prod-week-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e67e22, #d35400);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.8s ease;
         }
 
         /* AI Persona Styles */
@@ -1832,6 +1914,37 @@
             <div id="awbAlertsContainer"></div>
         </div>
 
+        <!-- Production Intelligence Section Header -->
+        <div class="prod-section-header" id="prodSectionHeader">
+            <h2><span>🌱</span> Producción Semanal - BigQuery Live Data</h2>
+            <p>Datos en tiempo real desde BigQuery | <span id="prodDataStatus" class="prod-data-status">Cargando...</span></p>
+        </div>
+
+        <!-- Card P1: Weekly Production Chart -->
+        <div class="dashboard-card prod-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Corte Semanal (Últimas 4 Semanas)
+                </div>
+                <div style="font-size:12px;color:#7f8c8d;" id="prodSemanalCount">-</div>
+            </div>
+            <div id="prodSemanalChart"></div>
+            <div class="card-footer" id="prodSemanalTimestamp">Actualizado: -</div>
+        </div>
+
+        <!-- Card P2: Health Alerts -->
+        <div class="dashboard-card prod-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🚨</span>
+                    Alertas Fitosanitarias
+                </div>
+                <div style="color:#e74c3c;font-weight:600;" id="prodAlertasCount">-</div>
+            </div>
+            <div id="prodAlertasContainer"></div>
+        </div>
+
         <!-- AI Persona Section Header -->
         <div class="ai-section-header" id="aiSectionHeader">
             <h2><span>🤖</span> AI Persona - WhatsApp Auto-Responder</h2>
@@ -2426,6 +2539,117 @@
             document.getElementById('customDateFrom').value = thirtyAgo.toISOString().split('T')[0];
         }
 
+        // ================================================================
+        // PRODUCTION INTELLIGENCE - Fetch and Render BigQuery Data
+        // ================================================================
+
+        const PROD_API_BASE = 'http://localhost:5000/api/produccion';
+        let prodDataSource = 'loading';
+
+        async function fetchProduccionSemanal() {
+            try {
+                const response = await fetch(`${PROD_API_BASE}/semanal?semanas=4`);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+
+                prodDataSource = data.source === 'bigquery' ? 'live' : (data.source === 'cache' ? 'cached' : 'fallback');
+                updateProdDataStatus(prodDataSource);
+                renderProduccionSemanal(data);
+            } catch (error) {
+                console.log('Production API error:', error);
+                prodDataSource = 'fallback';
+                updateProdDataStatus('fallback');
+                renderProduccionSemanal({ status: 'error', data: [], count: 0 });
+            }
+        }
+
+        async function fetchProduccionAlertas() {
+            try {
+                const response = await fetch(`${PROD_API_BASE}/alertas`);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                renderProduccionAlertas(data);
+            } catch (error) {
+                console.log('Alerts API error:', error);
+                renderProduccionAlertas({ status: 'error', data: [], count: 0 });
+            }
+        }
+
+        function updateProdDataStatus(source) {
+            const statusEl = document.getElementById('prodDataStatus');
+            if (source === 'live') {
+                statusEl.textContent = '🟢 Live Data (BigQuery)';
+                statusEl.className = 'prod-data-status live';
+            } else if (source === 'cached') {
+                statusEl.textContent = '🟡 Cached Data';
+                statusEl.className = 'prod-data-status cached';
+            } else {
+                statusEl.textContent = '🔴 Fallback Mode';
+                statusEl.className = 'prod-data-status fallback';
+            }
+        }
+
+        function renderProduccionSemanal(data) {
+            const weeklyData = data.data || [];
+            const timestamp = data.timestamp ? formatTimestamp(data.timestamp) : '-';
+
+            document.getElementById('prodSemanalTimestamp').textContent = 'Actualizado: ' + timestamp;
+            document.getElementById('prodSemanalCount').textContent = weeklyData.length + ' registros';
+
+            // Group by semana_iso and sum tallos
+            const weekMap = {};
+            weeklyData.forEach(row => {
+                const week = row.semana_iso || row.week_iso || 'Unknown';
+                if (!weekMap[week]) weekMap[week] = 0;
+                weekMap[week] += parseInt(row.total_tallos || row.tallos || 0);
+            });
+
+            // Sort weeks and take last 4
+            const weeks = Object.keys(weekMap).sort().slice(-4);
+            const maxTallos = Math.max(...weeks.map(w => weekMap[w]), 1);
+
+            const chartEl = document.getElementById('prodSemanalChart');
+            if (weeks.length === 0) {
+                chartEl.innerHTML = '<div style="text-align:center;color:#7f8c8d;padding:20px;">Sin datos de producción</div>';
+            } else {
+                chartEl.innerHTML = weeks.map(week => {
+                    const tallos = weekMap[week];
+                    const pct = Math.round((tallos / maxTallos) * 100);
+                    return '<div class="prod-week-bar">' +
+                        '<div class="prod-week-label">Sem ' + week + '</div>' +
+                        '<div class="prod-week-track">' +
+                        '<div class="prod-week-fill" style="width:' + pct + '%;">' +
+                        tallos.toLocaleString() + ' tallos</div>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        function renderProduccionAlertas(data) {
+            const alerts = data.data || [];
+            const alertsContainer = document.getElementById('prodAlertasContainer');
+
+            document.getElementById('prodAlertasCount').textContent = alerts.length;
+
+            if (alerts.length === 0) {
+                alertsContainer.innerHTML = '<div style="text-align:center;color:#27ae60;padding:16px;">✅ No hay alertas fitosanitarias</div>';
+            } else {
+                alertsContainer.innerHTML = alerts.slice(0, 5).map(alert => {
+                    const camaId = alert.cama_id || 'N/A';
+                    const sede = alert.sede_id || '';
+                    const mensaje = alert.alerta_enfermedad ? '🦠 Alerta enfermedad' :
+                                   alert.alerta_plaga ? '🐛 Alerta plaga' : '⚠️ Alerta';
+                    return '<div class="prod-alert-card">' +
+                        '<strong>' + camaId + '</strong> (' + sede + ') - ' + mensaje +
+                        '</div>';
+                }).join('');
+                if (alerts.length > 5) {
+                    alertsContainer.innerHTML += '<div style="text-align:center;color:#7f8c8d;padding:8px;font-size:12px;">+' + (alerts.length - 5) + ' alertas más</div>';
+                }
+            }
+        }
+
         // Fetch email analytics on page load and refresh every 60s
         document.addEventListener('DOMContentLoaded', function() {
             initDateInputs();
@@ -2434,6 +2658,11 @@
             // AWB Tracking
             fetchAWBTracking();
             setInterval(fetchAWBTracking, 60000);
+            // Production Intelligence
+            fetchProduccionSemanal();
+            fetchProduccionAlertas();
+            setInterval(fetchProduccionSemanal, 300000); // Every 5 minutes
+            setInterval(fetchProduccionAlertas, 300000);
             // AI Persona
             fetchAIPersona();
             setInterval(fetchAIPersona, 60000);
