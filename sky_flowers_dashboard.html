@@ -1057,7 +1057,7 @@
             .ai-half-width { grid-column: span 1; }
         }
 
-        /* Sofá Renzo — Planeación de Mano de Obra */
+        /* Software Renzo — Planeación de Mano de Obra */
         .renzo-section-header {
             grid-column: 1 / -1;
             background: linear-gradient(135deg, rgba(26,188,156,0.95), rgba(22,160,133,0.95));
@@ -2011,9 +2011,9 @@
             <div id="prodAlertasContainer"></div>
         </div>
 
-        <!-- Sofá Renzo Section Header -->
+        <!-- Software Renzo Section Header -->
         <div class="renzo-section-header">
-            <h2><span>👷</span> Sofá Renzo — Planeación de Mano de Obra</h2>
+            <h2><span>👷</span> Software Renzo — Planeación de Mano de Obra</h2>
             <p>Plan semanal vs. real por sede y labor | <span id="renzoDataStatus">Cargando...</span></p>
         </div>
 
@@ -2815,7 +2815,7 @@
             fetchAIPersona();
             setInterval(fetchAIPersona, 60000);
 
-            // Sofá Renzo
+            // Software Renzo
             initRenzoSemanas();
             fetchRenzoResumen(renzoSemanaActual);
             fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
@@ -3070,7 +3070,7 @@
         // SOFÁ RENZO — Plan vs Real de Mano de Obra
         // ================================================================
 
-        const RENZO_API_BASE = 'http://localhost:5000/api/sofa-renzo';
+        const RENZO_API_BASE = 'http://localhost:5000/api/software-renzo';
         // Semanas con plan (202610–202617) + últimas semanas ejecutadas
         const RENZO_SEMANAS = ['202608','202609','202610','202611','202612','202613','202614','202615','202616','202617'];
         let renzoSemanaActual = '202610';
