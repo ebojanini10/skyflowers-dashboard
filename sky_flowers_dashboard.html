@@ -1057,6 +1057,72 @@
             .ai-half-width { grid-column: span 1; }
         }
 
+        /* Sofá Renzo — Planeación de Mano de Obra */
+        .renzo-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(26,188,156,0.95), rgba(22,160,133,0.95));
+            border-radius: 16px;
+            padding: 20px 28px;
+            color: white;
+        }
+        .renzo-section-header h2 { font-size: 20px; margin-bottom: 4px; }
+        .renzo-section-header p  { font-size: 13px; opacity: 0.9; }
+        .renzo-full-width  { grid-column: 1 / -1; }
+        .renzo-half-width  { grid-column: span 1; }
+        @media (min-width: 769px) { .renzo-half-width { grid-column: span 1; } }
+
+        .renzo-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .renzo-controls select {
+            padding: 5px 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #2c3e50;
+            background: white;
+            cursor: pointer;
+        }
+        .renzo-controls label { font-size: 12px; color: #7f8c8d; font-weight: 600; }
+
+        .renzo-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .renzo-table th {
+            background: #f8f9fa;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #5d6d7e;
+            border-bottom: 2px solid #ecf0f1;
+            white-space: nowrap;
+        }
+        .renzo-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f2f3f4;
+            color: #2c3e50;
+        }
+        .renzo-table tr:hover td { background: #fafbfc; }
+        .renzo-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+        .sem-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .sem-verde    { background: #d5f5e3; color: #1e8449; }
+        .sem-amarillo { background: #fef9e7; color: #b7950b; }
+        .sem-rojo     { background: #fdedec; color: #c0392b; }
+        .sem-gris     { background: #eaecee; color: #717d7e; }
+
+        .renzo-scroll { max-height: 340px; overflow-y: auto; }
+        .renzo-no-data { text-align: center; color: #7f8c8d; padding: 24px; font-size: 13px; }
+
         .ai-health-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -1945,6 +2011,88 @@
             <div id="prodAlertasContainer"></div>
         </div>
 
+        <!-- Sofá Renzo Section Header -->
+        <div class="renzo-section-header">
+            <h2><span>👷</span> Sofá Renzo — Planeación de Mano de Obra</h2>
+            <p>Plan semanal vs. real por sede y labor | <span id="renzoDataStatus">Cargando...</span></p>
+        </div>
+
+        <!-- Card R1: Resumen por sede -->
+        <div class="dashboard-card renzo-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    Resumen por Sede
+                </div>
+                <div style="font-size:12px;color:#7f8c8d;" id="renzoResumenCount">-</div>
+            </div>
+            <div class="renzo-controls">
+                <label>Semana:</label>
+                <select id="renzoSemanaSelect" onchange="onRenzoSemanaChange()">
+                    <option value="">Cargando...</option>
+                </select>
+            </div>
+            <div class="renzo-scroll">
+                <table class="renzo-table">
+                    <thead>
+                        <tr>
+                            <th>Sede</th>
+                            <th class="num">Labores</th>
+                            <th class="num">Plan</th>
+                            <th class="num">Real</th>
+                            <th class="num">% Ejec.</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="renzoResumenBody">
+                        <tr><td colspan="6" class="renzo-no-data">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer" id="renzoResumenTimestamp">Actualizado: -</div>
+        </div>
+
+        <!-- Card R2: Detalle labores por sede -->
+        <div class="dashboard-card renzo-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🔍</span>
+                    Detalle por Labor
+                </div>
+                <div style="font-size:12px;color:#7f8c8d;" id="renzoDetalleCount">-</div>
+            </div>
+            <div class="renzo-controls">
+                <label>Sede:</label>
+                <select id="renzoSedeSelect" onchange="onRenzoSedeChange()">
+                    <option value="">Todas</option>
+                    <option value="SKY1">SKY1</option>
+                    <option value="SKY2">SKY2</option>
+                    <option value="SKY3">SKY3</option>
+                    <option value="SKY4">SKY4</option>
+                    <option value="SKY6">SKY6</option>
+                    <option value="SKY7">SKY7</option>
+                </select>
+            </div>
+            <div class="renzo-scroll">
+                <table class="renzo-table">
+                    <thead>
+                        <tr>
+                            <th>Labor</th>
+                            <th>Tipo</th>
+                            <th class="num">Plan</th>
+                            <th class="num">Real</th>
+                            <th class="num">H.Plan</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="renzoDetalleBody">
+                        <tr><td colspan="6" class="renzo-no-data">Selecciona una semana</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer" id="renzoDetalleTimestamp">Actualizado: -</div>
+        </div>
+
         <!-- AI Persona Section Header -->
         <div class="ai-section-header" id="aiSectionHeader">
             <h2><span>🤖</span> AI Persona - WhatsApp Auto-Responder</h2>
@@ -2666,6 +2814,15 @@
             // AI Persona
             fetchAIPersona();
             setInterval(fetchAIPersona, 60000);
+
+            // Sofá Renzo
+            initRenzoSemanas();
+            fetchRenzoResumen(renzoSemanaActual);
+            fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+            setInterval(() => {
+                fetchRenzoResumen(renzoSemanaActual);
+                fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+            }, 600000); // Refresca cada 10 min
         });
 
         // ================================================================
@@ -2909,6 +3066,111 @@
                 document.getElementById('awbDataStatus').style.color = '#e74c3c';
             }
         }
+        // ================================================================
+        // SOFÁ RENZO — Plan vs Real de Mano de Obra
+        // ================================================================
+
+        const RENZO_API_BASE = 'http://localhost:5000/api/sofa-renzo';
+        // Semanas con plan (202610–202617) + últimas semanas ejecutadas
+        const RENZO_SEMANAS = ['202608','202609','202610','202611','202612','202613','202614','202615','202616','202617'];
+        let renzoSemanaActual = '202610';
+        let renzoSedeActual = '';
+
+        function semPillHtml(semaforo) {
+            const cls = { VERDE: 'sem-verde', AMARILLO: 'sem-amarillo', ROJO: 'sem-rojo', GRIS: 'sem-gris' };
+            return `<span class="sem-pill ${cls[semaforo] || 'sem-gris'}">${semaforo || 'GRIS'}</span>`;
+        }
+
+        function initRenzoSemanas() {
+            const sel = document.getElementById('renzoSemanaSelect');
+            sel.innerHTML = RENZO_SEMANAS.map(s => `<option value="${s}"${s===renzoSemanaActual?' selected':''}>${s.slice(0,4)}-S${s.slice(4)}</option>`).join('');
+        }
+
+        function renderRenzoResumen(rows, timestamp) {
+            const tbody = document.getElementById('renzoResumenBody');
+            document.getElementById('renzoResumenCount').textContent = rows.length + ' sedes';
+            document.getElementById('renzoResumenTimestamp').textContent = 'Actualizado: ' + (timestamp ? timestamp.slice(11,19) : '-');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="renzo-no-data">Sin datos para esta semana</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(r => {
+                const pct = r.pct_ejecucion_plan != null ? r.pct_ejecucion_plan.toFixed(0) + '%' : '-';
+                return `<tr>
+                    <td><strong>${r.sede_id}</strong></td>
+                    <td class="num">${r.labores_con_plan ?? '-'}</td>
+                    <td class="num">${r.total_personas_plan ?? '-'}</td>
+                    <td class="num">${r.total_personas_real ?? '-'}</td>
+                    <td class="num">${pct}</td>
+                    <td>${semPillHtml(r.semaforo_global)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderRenzoDetalle(rows, timestamp) {
+            const tbody = document.getElementById('renzoDetalleBody');
+            document.getElementById('renzoDetalleCount').textContent = rows.length + ' labores';
+            document.getElementById('renzoDetalleTimestamp').textContent = 'Actualizado: ' + (timestamp ? timestamp.slice(11,19) : '-');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="renzo-no-data">Sin datos</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(r => {
+                const hplan = r.horas_planificadas != null ? r.horas_planificadas.toFixed(0) + 'h' : '-';
+                return `<tr>
+                    <td>${r.labor_nombre ?? '-'}</td>
+                    <td style="font-size:11px;color:#7f8c8d;">${r.tipo_labor ?? '-'}</td>
+                    <td class="num">${r.personas_planificadas ?? '-'}</td>
+                    <td class="num">${r.personas_reales ?? '-'}</td>
+                    <td class="num">${hplan}</td>
+                    <td>${semPillHtml(r.semaforo)}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        async function fetchRenzoResumen(semana) {
+            try {
+                const resp = await fetch(`${RENZO_API_BASE}/resumen?semana=${semana}`);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                if (data.status === 'error') throw new Error(data.error);
+                document.getElementById('renzoDataStatus').textContent = 'En vivo · BigQuery';
+                document.getElementById('renzoDataStatus').style.color = '#27ae60';
+                renderRenzoResumen(data.data || [], data.timestamp);
+            } catch (err) {
+                document.getElementById('renzoDataStatus').textContent = 'Sin conexión · iniciar bot';
+                document.getElementById('renzoDataStatus').style.color = '#e74c3c';
+                document.getElementById('renzoResumenBody').innerHTML =
+                    '<tr><td colspan="6" class="renzo-no-data">Bot offline · ' + err.message + '</td></tr>';
+            }
+        }
+
+        async function fetchRenzoDetalle(semana, sede) {
+            try {
+                let url = `${RENZO_API_BASE}/detalle?semana=${semana}`;
+                if (sede) url += `&sede=${sede}`;
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                if (data.status === 'error') throw new Error(data.error);
+                renderRenzoDetalle(data.data || [], data.timestamp);
+            } catch (err) {
+                document.getElementById('renzoDetalleBody').innerHTML =
+                    '<tr><td colspan="6" class="renzo-no-data">Error: ' + err.message + '</td></tr>';
+            }
+        }
+
+        function onRenzoSemanaChange() {
+            renzoSemanaActual = document.getElementById('renzoSemanaSelect').value;
+            fetchRenzoResumen(renzoSemanaActual);
+            fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+        }
+
+        function onRenzoSedeChange() {
+            renzoSedeActual = document.getElementById('renzoSedeSelect').value;
+            fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+        }
+
     </script>
 </body>
 </html>
