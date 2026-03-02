@@ -1,0 +1,3213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Flowers - Cloud Agent Teams Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .company-details h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .company-details p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #27ae60;
+            animation: pulse 2s infinite;
+        }
+
+        .last-update {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
+            font-size: 20px;
+        }
+
+        .agent-grid {
+            grid-column: 1 / -1;
+        }
+
+        .agents-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .agent-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #27ae60;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            animation: progress-shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .agent-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #d5fdd5;
+            color: #27ae60;
+        }
+
+        .agent-description {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .agent-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 2px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: progress-shine 2s infinite;
+        }
+
+        @keyframes progress-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .business-metrics {
+            grid-column: span 2;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+
+        .metric-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .metric-title {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .metric-subtitle {
+            font-size: 12px;
+            color: #95a5a6;
+        }
+
+        .system-monitoring {
+            grid-column: span 2;
+        }
+
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .monitor-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid #3498db;
+        }
+
+        .monitor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .monitor-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .monitor-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #27ae60;
+        }
+
+        .monitor-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+
+        .monitor-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .roi-dashboard {
+            grid-column: span 1;
+        }
+
+        .roi-highlight {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .roi-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .roi-period {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .efficiency-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .efficiency-item {
+            text-align: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .efficiency-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #27ae60;
+        }
+
+        .efficiency-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        .system-health {
+            grid-column: span 1;
+        }
+
+        .health-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .health-indicator:last-child {
+            border-bottom: none;
+        }
+
+        .health-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .health-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .health-percentage {
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .health-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #27ae60;
+        }
+
+        .alert-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffc107;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .alert-icon {
+            color: #856404;
+            font-size: 18px;
+        }
+
+        .alert-title {
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .alert-content {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .business-metrics,
+            .system-monitoring {
+                grid-column: span 1;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .metrics-grid,
+            .monitoring-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Email Analytics Styles */
+        .email-analytics-section {
+            grid-column: 1 / -1;
+        }
+
+        .email-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 4px;
+            border-left: 4px solid #3498db;
+        }
+
+        .email-section-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .email-section-header p {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .email-half-width {
+            grid-column: span 1;
+        }
+
+        .bar-chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .bar-label {
+            min-width: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            min-width: 40px;
+        }
+
+        .bar-fill.product-hydrangea { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .bar-fill.product-lepidium { background: linear-gradient(90deg, #f39c12, #f1c40f); }
+        .bar-fill.product-matricaria { background: linear-gradient(90deg, #e74c3c, #ec7063); }
+        .bar-fill.product-statice { background: linear-gradient(90deg, #9b59b6, #a569bd); }
+        .bar-fill.day-bar { background: linear-gradient(90deg, #3498db, #5dade2); }
+
+        .bar-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .email-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .email-table thead tr {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .email-table th {
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .email-table th:first-child { border-radius: 8px 0 0 0; }
+        .email-table th:last-child { border-radius: 0 8px 0 0; }
+
+        .email-table td {
+            padding: 8px 14px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .email-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .email-table tbody tr:hover {
+            background: #eaf2f8;
+        }
+
+        .product-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            margin: 1px 2px;
+        }
+
+        .product-tag.hydrangea { background: #e8f5e9; color: #2e7d32; }
+        .product-tag.lepidium { background: #fff3e0; color: #e65100; }
+        .product-tag.matricaria { background: #fce4ec; color: #c62828; }
+        .product-tag.statice { background: #f3e5f5; color: #6a1b9a; }
+
+        .kommet-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .kommet-badge.yes { background: #d5fdd5; color: #27ae60; }
+        .kommet-badge.no { background: #fde8e8; color: #e74c3c; }
+
+        .orders-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .email-data-status {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .email-data-status.live { color: #27ae60; }
+        .email-data-status.static { color: #f39c12; }
+
+        .period-filter {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .period-filter-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+        .period-btn {
+            padding: 5px 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            background: white;
+            color: #7f8c8d;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-color: #3498db;
+        }
+
+        .card-timestamp {
+            font-size: 11px;
+            color: #95a5a6;
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .period-note {
+            font-size: 11px;
+            color: #f39c12;
+            font-style: italic;
+            text-align: center;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .email-half-width {
+                grid-column: span 1;
+            }
+
+            .bar-label {
+                min-width: 60px;
+                font-size: 12px;
+            }
+        }
+
+        /* AWB Logistics Tracking Styles */
+        .awb-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(46, 204, 113, 0.1));
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 4px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .awb-section-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .awb-section-header p {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .awb-full-width {
+            grid-column: 1 / -1;
+        }
+
+        .awb-half-width {
+            grid-column: span 1;
+        }
+
+        .awb-status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .awb-status-badge.pending { background: #ecf0f1; color: #7f8c8d; }
+        .awb-status-badge.farm-shipped { background: #fff3e0; color: #e65100; }
+        .awb-status-badge.in-transit { background: #e3f2fd; color: #1565c0; }
+        .awb-status-badge.arrived { background: #e8f5e9; color: #2e7d32; }
+        .awb-status-badge.customs { background: #fce4ec; color: #c62828; }
+        .awb-status-badge.delivered { background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+
+        .awb-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .awb-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 1s ease;
+        }
+
+        .awb-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .awb-table thead tr {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .awb-table th {
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .awb-table th:first-child { border-radius: 8px 0 0 0; }
+        .awb-table th:last-child { border-radius: 0 8px 0 0; }
+
+        .awb-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .awb-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .awb-table tbody tr:hover {
+            background: #e8f5e9;
+        }
+
+        .awb-table tbody tr.awb-delayed {
+            border-left: 3px solid #e74c3c;
+        }
+
+        .awb-scroll {
+            max-height: 420px;
+            overflow-y: auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 768px) {
+            .awb-table {
+                min-width: 800px;
+            }
+        }
+
+        .awb-pipeline-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .awb-pipeline-label {
+            min-width: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .awb-pipeline-track {
+            flex: 1;
+            height: 28px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .awb-pipeline-fill {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-left: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            min-width: 30px;
+            transition: width 1s ease;
+        }
+
+        .awb-pipeline-fill.status-pending { background: linear-gradient(90deg, #95a5a6, #bdc3c7); }
+        .awb-pipeline-fill.status-farm-shipped { background: linear-gradient(90deg, #e67e22, #f39c12); }
+        .awb-pipeline-fill.status-in-transit { background: linear-gradient(90deg, #2980b9, #3498db); }
+        .awb-pipeline-fill.status-arrived { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+        .awb-pipeline-fill.status-customs { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+        .awb-pipeline-fill.status-delivered { background: linear-gradient(90deg, #1e8449, #27ae60); }
+
+        .awb-pipeline-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 30px;
+        }
+
+        .awb-daily-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .awb-daily-label {
+            min-width: 80px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: right;
+        }
+
+        .awb-daily-track {
+            flex: 1;
+            height: 24px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .awb-daily-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            min-width: 25px;
+            transition: width 1s ease;
+        }
+
+        .awb-alert-card {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .awb-alert-card.severity-high {
+            background: linear-gradient(135deg, #fde8e8, #fce4ec);
+            border-left: 4px solid #e74c3c;
+        }
+
+        .awb-alert-card.severity-medium {
+            background: linear-gradient(135deg, #fff8e1, #fff3e0);
+            border-left: 4px solid #f39c12;
+        }
+
+        .awb-severity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .awb-severity-badge.high { background: #e74c3c; color: white; }
+        .awb-severity-badge.medium { background: #f39c12; color: white; }
+
+        .awb-alert-message {
+            font-size: 13px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .awb-half-width {
+                grid-column: span 1;
+            }
+            .awb-pipeline-label, .awb-daily-label {
+                min-width: 60px;
+                font-size: 11px;
+            }
+        }
+
+        /* Production Intelligence Styles */
+        .prod-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(230, 126, 34, 0.95), rgba(211, 84, 0, 0.95));
+            border-radius: 16px;
+            padding: 20px 28px;
+            color: white;
+        }
+        .prod-section-header h2 { font-size: 20px; margin-bottom: 4px; }
+        .prod-section-header p { font-size: 13px; opacity: 0.9; }
+        .prod-full-width { grid-column: 1 / -1; }
+        .prod-half-width { grid-column: span 1; }
+        @media (min-width: 769px) {
+            .prod-half-width { grid-column: span 1; }
+        }
+        .prod-data-status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .prod-data-status.live {
+            background: rgba(46, 204, 113, 0.2);
+            color: #27ae60;
+        }
+        .prod-data-status.cached {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f39c12;
+        }
+        .prod-data-status.fallback {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        .prod-alert-card {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+            border-left: 4px solid #e74c3c;
+            font-size: 13px;
+        }
+        .prod-week-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .prod-week-label {
+            min-width: 80px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .prod-week-track {
+            flex: 1;
+            height: 22px;
+            background: #ecf0f1;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .prod-week-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e67e22, #d35400);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            transition: width 0.8s ease;
+        }
+
+        /* AI Persona Styles */
+        .ai-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(155,89,182,0.95), rgba(142,68,173,0.95));
+            border-radius: 16px;
+            padding: 20px 28px;
+            color: white;
+        }
+        .ai-section-header h2 { font-size: 20px; margin-bottom: 4px; }
+        .ai-section-header p { font-size: 13px; opacity: 0.9; }
+
+        .ai-full-width { grid-column: 1 / -1; }
+        .ai-half-width { grid-column: span 1; }
+        @media (min-width: 769px) {
+            .ai-half-width { grid-column: span 1; }
+        }
+
+        /* Software Renzo — Planeación de Mano de Obra */
+        .renzo-section-header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(26,188,156,0.95), rgba(22,160,133,0.95));
+            border-radius: 16px;
+            padding: 20px 28px;
+            color: white;
+        }
+        .renzo-section-header h2 { font-size: 20px; margin-bottom: 4px; }
+        .renzo-section-header p  { font-size: 13px; opacity: 0.9; }
+        .renzo-full-width  { grid-column: 1 / -1; }
+        .renzo-half-width  { grid-column: span 1; }
+        @media (min-width: 769px) { .renzo-half-width { grid-column: span 1; } }
+
+        .renzo-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .renzo-controls select {
+            padding: 5px 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #2c3e50;
+            background: white;
+            cursor: pointer;
+        }
+        .renzo-controls label { font-size: 12px; color: #7f8c8d; font-weight: 600; }
+
+        .renzo-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .renzo-table th {
+            background: #f8f9fa;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #5d6d7e;
+            border-bottom: 2px solid #ecf0f1;
+            white-space: nowrap;
+        }
+        .renzo-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f2f3f4;
+            color: #2c3e50;
+        }
+        .renzo-table tr:hover td { background: #fafbfc; }
+        .renzo-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+        .sem-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .sem-verde    { background: #d5f5e3; color: #1e8449; }
+        .sem-amarillo { background: #fef9e7; color: #b7950b; }
+        .sem-rojo     { background: #fdedec; color: #c0392b; }
+        .sem-gris     { background: #eaecee; color: #717d7e; }
+
+        .renzo-scroll { max-height: 340px; overflow-y: auto; }
+        .renzo-no-data { text-align: center; color: #7f8c8d; padding: 24px; font-size: 13px; }
+
+        .ai-health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+        }
+        .ai-health-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+        }
+        .ai-health-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .ai-health-dot.ok { background: #27ae60; }
+        .ai-health-dot.warn { background: #f39c12; }
+        .ai-health-dot.err { background: #e74c3c; }
+
+        .ai-activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .ai-activity-table th {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        .ai-activity-table th:first-child { border-radius: 8px 0 0 0; }
+        .ai-activity-table th:last-child { border-radius: 0 8px 0 0; }
+        .ai-activity-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .ai-scroll { max-height: 280px; overflow-y: auto; }
+
+        .ai-hourly-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .ai-hourly-label {
+            min-width: 45px;
+            font-size: 11px;
+            color: #7f8c8d;
+            text-align: right;
+        }
+        .ai-hourly-track {
+            flex: 1;
+            height: 18px;
+            background: #f0f0f0;
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        .ai-hourly-fill {
+            height: 100%;
+            border-radius: 9px;
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+            display: flex;
+            align-items: center;
+            padding-left: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            min-width: 18px;
+            transition: width 1s ease;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="company-info">
+                <div class="company-logo">SF</div>
+                <div class="company-details">
+                    <h1>Sky Flowers</h1>
+                    <p>Cloud Agent Teams Monitoring Dashboard</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <div class="status-indicator"></div>
+                <div>
+                    <div>System Status: <strong>Operational</strong></div>
+                    <div class="last-update">Last Update: <span id="lastUpdate">Loading...</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Agent Status Grid -->
+        <div class="dashboard-card agent-grid">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🤖</span>
+                    Cloud Agent Teams Status
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">6/6 Active</div>
+            </div>
+            <div class="agents-container">
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent A: CEVA/DSV API</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">API Integration for logistics providers - 25% agency coverage achieved</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Completion</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">25%</div>
+                            <div class="metric-label">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent B: BigQuery Sync</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">Bidirectional sync between SQL Server and BigQuery analytics platform</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">21.7K+</div>
+                            <div class="metric-label">Records</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">99.8%</div>
+                            <div class="metric-label">Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent C: Mobile Backend</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">End-to-end mobile integration for field operations and GPS tracking</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Integration</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">Real-time</div>
+                            <div class="metric-label">Sync</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent D: Airline Coverage</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">Complete airline coverage expansion from 69% to 100% (13/13)</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">13/13</div>
+                            <div class="metric-label">Airlines</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">100%</div>
+                            <div class="metric-label">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent E: Admin Automation</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">FASE 7 administrative automation achieving 85% process automation</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">85%</div>
+                            <div class="metric-label">Automated</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">$120M</div>
+                            <div class="metric-label">COP Saved</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="agent-card">
+                    <div class="agent-header">
+                        <div class="agent-name">Agent F: Web Scraping</div>
+                        <div class="agent-status">✓ Completed</div>
+                    </div>
+                    <div class="agent-description">Agency web scraping expansion from 25% to 40% coverage</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <div class="metric-value">7/16</div>
+                            <div class="metric-label">Agencies</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">40%</div>
+                            <div class="metric-label">Coverage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Metrics Panel -->
+        <div class="dashboard-card business-metrics">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Business Transformation Metrics
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">9/9 Tareas | Fase 4 Completa</div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">✈️</div>
+                    <div class="metric-title">Airline Coverage</div>
+                    <div class="metric-number">100%</div>
+                    <div class="metric-subtitle">13/13 Airlines</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🏢</div>
+                    <div class="metric-title">Agency Coverage</div>
+                    <div class="metric-number">40%</div>
+                    <div class="metric-subtitle">7/16 Sources</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-title">Automation</div>
+                    <div class="metric-number">85%</div>
+                    <div class="metric-subtitle">Administrative</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📱</div>
+                    <div class="metric-title">Mobile Ops</div>
+                    <div class="metric-number">100%</div>
+                    <div class="metric-subtitle">End-to-End</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔄</div>
+                    <div class="metric-title">Data Sync</div>
+                    <div class="metric-number">21.7K+</div>
+                    <div class="metric-subtitle">Records</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-title">System Status</div>
+                    <div class="metric-number">99%</div>
+                    <div class="metric-subtitle">Complete</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live System Monitoring -->
+        <div class="dashboard-card system-monitoring">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🖥️</span>
+                    Live System Monitoring
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">All Systems Operational</div>
+            </div>
+            <div class="monitoring-grid">
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">BigQuery Status</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">99.8%</div>
+                    <div class="monitor-label">Stream Health</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Smart Scheduler</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">98.5%</div>
+                    <div class="monitor-label">Success Rate</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">WhatsApp Integration</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">1,247</div>
+                    <div class="monitor-label">Messages Today</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Mobile App Sync</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">Real-time</div>
+                    <div class="monitor-label">GPS Tracking</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Error Rate</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">0.3%</div>
+                    <div class="monitor-label">System-wide</div>
+                </div>
+                <div class="monitor-card">
+                    <div class="monitor-header">
+                        <div class="monitor-title">Uptime</div>
+                        <div class="monitor-status"></div>
+                    </div>
+                    <div class="monitor-value">99.7%</div>
+                    <div class="monitor-label">Target Met</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROI & Business Impact -->
+        <div class="dashboard-card roi-dashboard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">💰</span>
+                    ROI & Business Impact
+                </div>
+            </div>
+            <div class="roi-highlight">
+                <div class="roi-amount">$684M COP</div>
+                <div class="roi-period">Revenue 2025 | $120M COP Ahorro Anual</div>
+            </div>
+            <div class="efficiency-metrics">
+                <div class="efficiency-item">
+                    <div class="efficiency-value">833K</div>
+                    <div class="efficiency-label">Plantas Totales</div>
+                </div>
+                <div class="efficiency-item">
+                    <div class="efficiency-value">7</div>
+                    <div class="efficiency-label">Fincas Activas</div>
+                </div>
+                <div class="efficiency-item">
+                    <div class="efficiency-value">14M+</div>
+                    <div class="efficiency-label">Tallos/Ano</div>
+                </div>
+                <div class="efficiency-item">
+                    <div class="efficiency-value">74-94%</div>
+                    <div class="efficiency-label">Margen Bruto</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health Overview -->
+        <div class="dashboard-card system-health">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">❤️</span>
+                    System Health Overview
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">System Uptime</div>
+                <div class="health-value">
+                    <div class="health-percentage">99.7%</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Response Time</div>
+                <div class="health-value">
+                    <div class="health-percentage">< 200ms</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Data Quality</div>
+                <div class="health-value">
+                    <div class="health-percentage">99.8%</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Sync Accuracy</div>
+                <div class="health-value">
+                    <div class="health-percentage">99.9%</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+            <div class="health-indicator">
+                <div class="health-label">Cloud Resources</div>
+                <div class="health-value">
+                    <div class="health-percentage">Optimal</div>
+                    <div class="health-status-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Farm Infrastructure Overview -->
+        <div class="dashboard-card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🌿</span>
+                    Infraestructura Productiva - 7 Fincas
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">833,560 Plantas Totales</div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <thead>
+                        <tr style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                            <th style="padding: 12px 16px; text-align: left; border-radius: 8px 0 0 0;">Finca</th>
+                            <th style="padding: 12px 16px; text-align: left;">Productos</th>
+                            <th style="padding: 12px 16px; text-align: right;">Bloques</th>
+                            <th style="padding: 12px 16px; text-align: right;">Area Lineal (m)</th>
+                            <th style="padding: 12px 16px; text-align: right; border-radius: 0 8px 0 0;">Plantas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 1</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">Hydrangea</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span> <span style="background:#fce4ec;padding:2px 8px;border-radius:12px;font-size:12px;">Girasol</span> <span style="background:#e3f2fd;padding:2px 8px;border-radius:12px;font-size:12px;">Matricaria</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">2,212</td>
+                            <td style="padding: 10px 16px; text-align: right;">37,501</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">150,004</td>
+                        </tr>
+                        <tr style="background: #f8f9fa; border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 2</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">Hydrangea</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span> <span style="background:#e3f2fd;padding:2px 8px;border-radius:12px;font-size:12px;">Matricaria</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">1,211</td>
+                            <td style="padding: 10px 16px; text-align: right;">25,612</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">102,448</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 3</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">Hydrangea</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">1,325</td>
+                            <td style="padding: 10px 16px; text-align: right;">25,691</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">102,764</td>
+                        </tr>
+                        <tr style="background: #f8f9fa; border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 4</td>
+                            <td style="padding: 10px 16px;"><span style="background:#fce4ec;padding:2px 8px;border-radius:12px;font-size:12px;">Girasol</span> <span style="background:#fff3e0;padding:2px 8px;border-radius:12px;font-size:12px;">Lepidium</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">1,644</td>
+                            <td style="padding: 10px 16px; text-align: right;">33,708</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">134,832</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 5</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e3f2fd;padding:2px 8px;border-radius:12px;font-size:12px;">Matricaria</span> <span style="background:#f3e5f5;padding:2px 8px;border-radius:12px;font-size:12px;">Statice</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">219</td>
+                            <td style="padding: 10px 16px; text-align: right;">3,136</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">12,544</td>
+                        </tr>
+                        <tr style="background: #f8f9fa; border-bottom: 1px solid #ecf0f1;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 6</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">100% Hydrangea</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">2,996</td>
+                            <td style="padding: 10px 16px; text-align: right;">74,372</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">297,488</td>
+                        </tr>
+                        <tr style="border-bottom: 2px solid #667eea;">
+                            <td style="padding: 10px 16px; font-weight: 600;">SKY 7</td>
+                            <td style="padding: 10px 16px;"><span style="background:#e8f5e9;padding:2px 8px;border-radius:12px;font-size:12px;">100% Hydrangea</span></td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600;">837</td>
+                            <td style="padding: 10px 16px; text-align: right;">8,370</td>
+                            <td style="padding: 10px 16px; text-align: right; font-weight: 600; color: #27ae60;">33,480</td>
+                        </tr>
+                        <tr style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); font-weight: 700;">
+                            <td style="padding: 12px 16px; border-radius: 0 0 0 8px;">TOTAL</td>
+                            <td style="padding: 12px 16px;">7 Fincas - 5 Productos</td>
+                            <td style="padding: 12px 16px; text-align: right;">10,444</td>
+                            <td style="padding: 12px 16px; text-align: right;">208,390</td>
+                            <td style="padding: 12px 16px; text-align: right; color: #1b5e20; font-size: 16px; border-radius: 0 0 8px 0;">833,560</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: #7f8c8d; text-align: right;">
+                Formula: 4 plantas por metro lineal | Datos: bloques.csv Feb 2026 | 203 empleados activos
+            </div>
+        </div>
+
+        <!-- Production Capacity -->
+        <div class="dashboard-card" style="grid-column: 1 / -1;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📈</span>
+                    Capacidad Productiva y Metricas Operacionales
+                </div>
+                <div style="color: #27ae60; font-weight: 600;">14M+ tallos/ano</div>
+            </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">🌸</div>
+                    <div class="metric-title">Produccion Semanal</div>
+                    <div class="metric-number">235K+</div>
+                    <div class="metric-subtitle">Tallos por semana</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">👥</div>
+                    <div class="metric-title">Empleados</div>
+                    <div class="metric-number">203</div>
+                    <div class="metric-subtitle">131 campo, 53 poscosecha, 19 admin</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🎯</div>
+                    <div class="metric-title">Bloques Activos</div>
+                    <div class="metric-number">8,742</div>
+                    <div class="metric-subtitle">83.7% utilizacion</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🌿</div>
+                    <div class="metric-title">Variedades</div>
+                    <div class="metric-number">49</div>
+                    <div class="metric-subtitle">Hydrangea, Lepidium, Girasol, Matricaria</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-title">Costo/Tallo</div>
+                    <div class="metric-number">$140</div>
+                    <div class="metric-subtitle">COP promedio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-title">Turnos Completados</div>
+                    <div class="metric-number">99.4%</div>
+                    <div class="metric-subtitle">Tasa de cumplimiento</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Analytics Section Header -->
+        <div class="email-section-header">
+            <h2><span>📧</span> Email Analytics Comercial</h2>
+            <p>Datos del scanner Gmail multi-cuenta | <span id="emailDataStatus">Cargando...</span></p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+                <div class="period-filter" id="periodFilter">
+                    <span class="period-filter-label">Periodo:</span>
+                    <button class="period-btn" data-days="1" onclick="setPeriodFilter(1)">Hoy</button>
+                    <button class="period-btn" data-days="7" onclick="setPeriodFilter(7)">7 dias</button>
+                    <button class="period-btn" data-days="15" onclick="setPeriodFilter(15)">15 dias</button>
+                    <button class="period-btn active" data-days="30" onclick="setPeriodFilter(30)">30 dias</button>
+                    <input type="date" id="customDateFrom" style="padding:4px 8px;border:2px solid #e9ecef;border-radius:8px;font-size:12px;color:#7f8c8d;" title="Fecha desde">
+                    <span style="font-size:12px;color:#7f8c8d;">a</span>
+                    <input type="date" id="customDateTo" style="padding:4px 8px;border:2px solid #e9ecef;border-radius:8px;font-size:12px;color:#7f8c8d;" title="Fecha hasta">
+                    <button class="period-btn" onclick="setCustomPeriod()">Aplicar</button>
+                </div>
+                <div style="font-size:11px;color:#95a5a6;" id="periodInfo">Mostrando: ultimos 30 dias</div>
+            </div>
+        </div>
+
+        <!-- Card A: Email Commercial Summary -->
+        <div class="dashboard-card email-analytics-section" id="emailSummaryCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Email Commercial Summary
+                </div>
+                <div>
+                    <div style="color: #3498db; font-weight: 600;" id="emailScanDate">-</div>
+                    <span class="card-timestamp" id="summaryTimestamp">-</span>
+                </div>
+            </div>
+            <div class="metrics-grid" id="emailSummaryMetrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📨</div>
+                    <div class="metric-title">Total Emails</div>
+                    <div class="metric-number" id="metricTotalEmails">-</div>
+                    <div class="metric-subtitle">Ultimos 30 dias</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-title">Ordenes</div>
+                    <div class="metric-number" id="metricOrders">-</div>
+                    <div class="metric-subtitle">Detectadas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💬</div>
+                    <div class="metric-title">Cotizaciones</div>
+                    <div class="metric-number" id="metricQuotes">-</div>
+                    <div class="metric-subtitle">Detectadas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📐</div>
+                    <div class="metric-title">Ratio O/C</div>
+                    <div class="metric-number" id="metricRatio">-</div>
+                    <div class="metric-subtitle">Ordenes / Cotizaciones</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🌸</div>
+                    <div class="metric-title">Productos Mencionados</div>
+                    <div class="metric-number" id="metricProducts">-</div>
+                    <div class="metric-subtitle">En emails</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔗</div>
+                    <div class="metric-title">Kommet Matches</div>
+                    <div class="metric-number" id="metricKommet">-</div>
+                    <div class="metric-subtitle" id="metricKommetRate">-</div>
+                </div>
+            </div>
+            <div class="period-note" id="summaryPeriodNote">Datos agregados del periodo completo del scan (30 dias)</div>
+        </div>
+
+        <!-- Card B: Top Clientes Comerciales -->
+        <div class="dashboard-card email-analytics-section" id="emailClientsCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">👥</span>
+                    Top Clientes Comerciales
+                </div>
+                <div>
+                    <div style="color: #3498db; font-weight: 600;" id="clientCount">-</div>
+                    <span class="card-timestamp" id="clientsTimestamp">-</span>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="email-table" id="clientsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Cliente</th>
+                            <th>Email</th>
+                            <th style="text-align:right;">Emails</th>
+                            <th style="text-align:right;">Ordenes</th>
+                            <th style="text-align:right;">Cotizaciones</th>
+                            <th>Productos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsTableBody">
+                        <tr><td colspan="7" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="period-note" id="clientsPeriodNote">Datos agregados del periodo completo del scan (30 dias)</div>
+        </div>
+
+        <!-- Card C: Demanda por Producto (half-width) -->
+        <div class="dashboard-card email-half-width" id="emailProductsCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🌿</span>
+                    Demanda por Producto
+                </div>
+                <span class="card-timestamp" id="productsTimestamp">-</span>
+            </div>
+            <div class="bar-chart-container" id="productDemandChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+            <div class="period-note" id="productsPeriodNote">Periodo completo (30d)</div>
+        </div>
+
+        <!-- Card D: Volumen por Dia (half-width) -->
+        <div class="dashboard-card email-half-width" id="emailVolumeCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📅</span>
+                    Volumen por Dia de la Semana
+                </div>
+                <span class="card-timestamp" id="volumeTimestamp">-</span>
+            </div>
+            <div class="bar-chart-container" id="volumeByDayChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+            <div class="period-note" id="volumePeriodNote">Periodo completo (30d)</div>
+        </div>
+
+        <!-- Card E: Ordenes Recientes -->
+        <div class="dashboard-card email-analytics-section" id="emailOrdersCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📦</span>
+                    Ordenes Recientes
+                </div>
+                <div>
+                    <div style="color: #3498db; font-weight: 600;" id="ordersCount">-</div>
+                    <span class="card-timestamp" id="ordersTimestamp">-</span>
+                </div>
+            </div>
+            <div class="orders-scroll">
+                <table class="email-table" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Remitente</th>
+                            <th>Asunto</th>
+                            <th>Productos</th>
+                            <th>Kommet</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <tr><td colspan="5" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- AWB Logistics Tracking Section Header -->
+        <div class="awb-section-header" id="awbSectionHeader">
+            <h2><span>✈️</span> AWB Logistics Tracking</h2>
+            <p>Komet Sales API | <span id="awbDataStatus">Cargando...</span></p>
+        </div>
+
+        <!-- Card F: AWB Summary KPIs -->
+        <div class="dashboard-card awb-full-width" id="awbSummaryCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📦</span>
+                    AWB Summary
+                </div>
+                <div>
+                    <div style="color: #27ae60; font-weight: 600;" id="awbScanInfo">-</div>
+                    <span class="card-timestamp" id="awbTimestamp">-</span>
+                </div>
+            </div>
+            <div class="metrics-grid" id="awbSummaryMetrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📋</div>
+                    <div class="metric-title">AWBs Activos</div>
+                    <div class="metric-number" id="awbMetricTotal">-</div>
+                    <div class="metric-subtitle">En seguimiento</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📦</div>
+                    <div class="metric-title">Piezas Totales</div>
+                    <div class="metric-number" id="awbMetricPieces">-</div>
+                    <div class="metric-subtitle" id="awbMetricPiecesReceived">-</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-title">Tasa Entrega</div>
+                    <div class="metric-number" id="awbMetricDelivery">-</div>
+                    <div class="metric-subtitle">Piezas recibidas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">✈️</div>
+                    <div class="metric-title">Carriers Activos</div>
+                    <div class="metric-number" id="awbMetricCarriers">-</div>
+                    <div class="metric-subtitle">Aerolineas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⚠️</div>
+                    <div class="metric-title">Alertas</div>
+                    <div class="metric-number" id="awbMetricAlerts">-</div>
+                    <div class="metric-subtitle">Requieren atencion</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔌</div>
+                    <div class="metric-title">API Budget</div>
+                    <div class="metric-number" id="awbMetricAPI">-</div>
+                    <div class="metric-subtitle">Calls usadas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card G: Pipeline de Estado (half-width) -->
+        <div class="dashboard-card awb-half-width" id="awbPipelineCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🔄</span>
+                    Pipeline de Estado
+                </div>
+            </div>
+            <div id="awbPipelineChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+        </div>
+
+        <!-- Card H: Volumen Diario (half-width) -->
+        <div class="dashboard-card awb-half-width" id="awbVolumeCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📅</span>
+                    Volumen Diario
+                </div>
+            </div>
+            <div id="awbVolumeChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+        </div>
+
+        <!-- Card I: AWBs Activos Table -->
+        <div class="dashboard-card awb-full-width" id="awbTableCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    AWBs Activos
+                </div>
+                <div style="color: #27ae60; font-weight: 600;" id="awbTableCount">-</div>
+            </div>
+            <div class="awb-scroll">
+                <table class="awb-table" id="awbTable">
+                    <thead>
+                        <tr>
+                            <th>AWB</th>
+                            <th>Origen</th>
+                            <th>Fecha</th>
+                            <th>Carrier</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Piezas</th>
+                            <th style="min-width:100px;">Progreso</th>
+                            <th style="text-align:right;">Dias</th>
+                            <th>Clientes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="awbTableBody">
+                        <tr><td colspan="9" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Card J: AWB Alerts (conditional) -->
+        <div class="dashboard-card awb-full-width" id="awbAlertsCard" style="display:none;">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🚨</span>
+                    Alertas Logisticas
+                </div>
+                <div style="color: #e74c3c; font-weight: 600;" id="awbAlertsCount">-</div>
+            </div>
+            <div id="awbAlertsContainer"></div>
+        </div>
+
+        <!-- Production Intelligence Section Header -->
+        <div class="prod-section-header" id="prodSectionHeader">
+            <h2><span>🌱</span> Producción Semanal - BigQuery Live Data</h2>
+            <p>Datos en tiempo real desde BigQuery | <span id="prodDataStatus" class="prod-data-status">Cargando...</span></p>
+        </div>
+
+        <!-- Card P1: Weekly Production Chart -->
+        <div class="dashboard-card prod-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Corte Semanal (Últimas 4 Semanas)
+                </div>
+                <div style="font-size:12px;color:#7f8c8d;" id="prodSemanalCount">-</div>
+            </div>
+            <div id="prodSemanalChart"></div>
+            <div class="card-footer" id="prodSemanalTimestamp">Actualizado: -</div>
+        </div>
+
+        <!-- Card P2: Health Alerts -->
+        <div class="dashboard-card prod-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🚨</span>
+                    Alertas Fitosanitarias
+                </div>
+                <div style="color:#e74c3c;font-weight:600;" id="prodAlertasCount">-</div>
+            </div>
+            <div id="prodAlertasContainer"></div>
+        </div>
+
+        <!-- Software Renzo Section Header -->
+        <div class="renzo-section-header">
+            <h2><span>👷</span> Software Renzo — Proyección de Mano de Obra</h2>
+            <p>Demanda proyectada por sede y labor (calendario × camas activas) | <span id="renzoDataStatus">Cargando...</span></p>
+        </div>
+
+        <!-- Card R1: Resumen por sede -->
+        <div class="dashboard-card renzo-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📋</span>
+                    Resumen por Sede
+                </div>
+                <div style="font-size:12px;color:#7f8c8d;" id="renzoResumenCount">-</div>
+            </div>
+            <div class="renzo-controls">
+                <label>Semana:</label>
+                <select id="renzoSemanaSelect" onchange="onRenzoSemanaChange()">
+                    <option value="">Cargando...</option>
+                </select>
+            </div>
+            <div class="renzo-scroll">
+                <table class="renzo-table">
+                    <thead>
+                        <tr>
+                            <th>Sede</th>
+                            <th class="num">Labores</th>
+                            <th class="num">Pers. Req.</th>
+                            <th class="num">Horas</th>
+                            <th>Confianza</th>
+                        </tr>
+                    </thead>
+                    <tbody id="renzoResumenBody">
+                        <tr><td colspan="5" class="renzo-no-data">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer" id="renzoResumenTimestamp">Actualizado: -</div>
+        </div>
+
+        <!-- Card R2: Detalle labores por sede -->
+        <div class="dashboard-card renzo-half-width">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">🔍</span>
+                    Detalle por Labor
+                </div>
+                <div style="font-size:12px;color:#7f8c8d;" id="renzoDetalleCount">-</div>
+            </div>
+            <div class="renzo-controls">
+                <label>Sede:</label>
+                <select id="renzoSedeSelect" onchange="onRenzoSedeChange()">
+                    <option value="">Todas</option>
+                    <option value="SKY1">SKY1</option>
+                    <option value="SKY2">SKY2</option>
+                    <option value="SKY3">SKY3</option>
+                    <option value="SKY4">SKY4</option>
+                    <option value="SKY6">SKY6</option>
+                    <option value="SKY7">SKY7</option>
+                </select>
+            </div>
+            <div class="renzo-scroll">
+                <table class="renzo-table">
+                    <thead>
+                        <tr>
+                            <th>Labor</th>
+                            <th>Tipo</th>
+                            <th class="num">Camas</th>
+                            <th class="num">Pers. Req.</th>
+                            <th class="num">Horas</th>
+                            <th>Confianza</th>
+                        </tr>
+                    </thead>
+                    <tbody id="renzoDetalleBody">
+                        <tr><td colspan="6" class="renzo-no-data">Selecciona una semana</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer" id="renzoDetalleTimestamp">Actualizado: -</div>
+        </div>
+
+        <!-- AI Persona Section Header -->
+        <div class="ai-section-header" id="aiSectionHeader">
+            <h2><span>🤖</span> AI Persona - WhatsApp Auto-Responder</h2>
+            <p>Motor AI imitando estilo de Emiliano | <span id="aiDataStatus">Cargando...</span></p>
+        </div>
+
+        <!-- Card K: AI Persona Summary KPIs -->
+        <div class="dashboard-card ai-full-width" id="aiSummaryCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">💬</span>
+                    AI Persona Summary
+                </div>
+                <div>
+                    <span class="card-timestamp" id="aiTimestamp">-</span>
+                </div>
+            </div>
+            <div class="metrics-grid" id="aiSummaryMetrics">
+                <div class="metric-card">
+                    <div class="metric-icon">📨</div>
+                    <div class="metric-title">Mensajes Hoy</div>
+                    <div class="metric-number" id="aiMetricToday">-</div>
+                    <div class="metric-subtitle">Respuestas enviadas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-title">Latencia Promedio</div>
+                    <div class="metric-number" id="aiMetricLatency">-</div>
+                    <div class="metric-subtitle">Segundos</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💬</div>
+                    <div class="metric-title">Conversaciones</div>
+                    <div class="metric-number" id="aiMetricConvos">-</div>
+                    <div class="metric-subtitle">Activas</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-title">Total Respuestas</div>
+                    <div class="metric-number" id="aiMetricTotal">-</div>
+                    <div class="metric-subtitle">Desde inicio</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">❌</div>
+                    <div class="metric-title">Errores</div>
+                    <div class="metric-number" id="aiMetricErrors">-</div>
+                    <div class="metric-subtitle">Fallidos</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🧠</div>
+                    <div class="metric-title">ChromaDB</div>
+                    <div class="metric-number" id="aiMetricChroma">-</div>
+                    <div class="metric-subtitle">Documentos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card L: Volumen por Hora (half-width) -->
+        <div class="dashboard-card ai-half-width" id="aiVolumeCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📊</span>
+                    Volumen por Hora
+                </div>
+            </div>
+            <div id="aiVolumeChart">
+                <div style="text-align:center;color:#7f8c8d;">Cargando datos...</div>
+            </div>
+        </div>
+
+        <!-- Card N: System Health (half-width) -->
+        <div class="dashboard-card ai-half-width" id="aiHealthCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">❤️</span>
+                    Salud del Sistema
+                </div>
+            </div>
+            <div class="ai-health-grid" id="aiHealthGrid">
+                <div class="ai-health-item">
+                    <div><span class="ai-health-dot" id="aiHealthLLM"></span>LLM API</div>
+                    <div style="font-size:12px;color:#7f8c8d;" id="aiHealthLLMInfo">-</div>
+                </div>
+                <div class="ai-health-item">
+                    <div><span class="ai-health-dot" id="aiHealthChroma"></span>ChromaDB</div>
+                    <div style="font-size:12px;color:#7f8c8d;" id="aiHealthChromaInfo">-</div>
+                </div>
+                <div class="ai-health-item">
+                    <div><span class="ai-health-dot" id="aiHealthBaileys"></span>Baileys</div>
+                    <div style="font-size:12px;color:#7f8c8d;" id="aiHealthBaileysInfo">-</div>
+                </div>
+                <div class="ai-health-item">
+                    <div><span class="ai-health-dot" id="aiHealthEngine"></span>AI Engine</div>
+                    <div style="font-size:12px;color:#7f8c8d;" id="aiHealthEngineInfo">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card M: Actividad Reciente -->
+        <div class="dashboard-card ai-full-width" id="aiActivityCard">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="card-icon">📝</span>
+                    Actividad Reciente
+                </div>
+                <div style="color: #9b59b6; font-weight: 600;" id="aiActivityCount">-</div>
+            </div>
+            <div class="ai-scroll">
+                <table class="ai-activity-table" id="aiActivityTable">
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Contacto</th>
+                            <th>Mensaje</th>
+                            <th>Respuesta</th>
+                            <th style="text-align:right;">Latencia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="aiActivityBody">
+                        <tr><td colspan="5" style="text-align:center;color:#7f8c8d;">Cargando datos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Alert Section -->
+        <div class="alert-section">
+            <div class="alert-header">
+                <div class="alert-icon">ℹ️</div>
+                <div class="alert-title">Estado del Sistema - Febrero 2026</div>
+            </div>
+            <div class="alert-content">
+                <strong>Fase 4 de Reestructuracion:</strong> 9/9 tareas completadas. API Kommet Sales operativo para precios reales.
+                <br>6 Cloud Agent Teams operativos. 7 fincas activas con 833,560 plantas. 435 clientes, $684M COP revenue 2025.
+                <br><strong>3 Blockers Criticos:</strong> Automatizacion cierre de cama | Integracion campo-poscosecha | Automatizacion plan de podas.
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Sky Flowers - Cloud Agent Teams Dashboard | 7 Fincas | 833,560 Plantas | Actualizado: Febrero 16, 2026</p>
+        <p>Fase 4 Reestructuracion | 203 Empleados | 435 Clientes | Auto-refresh: 30s</p>
+    </div>
+
+    <script>
+        // Auto-refresh functionality
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-CO', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZone: 'America/Bogota'
+            });
+            document.getElementById('lastUpdate').textContent = timeString + ' COT';
+        }
+
+        // Simulate real-time data updates
+        function updateMetrics() {
+            // Update message count with slight variation
+            const messageElements = document.querySelectorAll('.monitor-value');
+            if (messageElements[2]) {
+                const currentCount = parseInt(messageElements[2].textContent.replace(',', ''));
+                const newCount = currentCount + Math.floor(Math.random() * 5);
+                messageElements[2].textContent = newCount.toLocaleString();
+            }
+
+            // Update error rate with small fluctuations
+            if (messageElements[4]) {
+                const errorRate = (Math.random() * 0.5).toFixed(1);
+                messageElements[4].textContent = errorRate + '%';
+            }
+        }
+
+        // Animate progress bars
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateLastUpdate();
+            updateMetrics();
+            animateProgressBars();
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            updateLastUpdate();
+            updateMetrics();
+        }, 30000);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+        // Add interactive hover effects
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 12px 28px rgba(0, 0, 0, 0.15)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Add click functionality for detailed views
+        document.querySelectorAll('.agent-card').forEach((card, index) => {
+            card.addEventListener('click', function() {
+                const agentNames = [
+                    'CEVA/DSV API Integration',
+                    'BigQuery Bidirectional Sync',
+                    'Mobile Backend Integration',
+                    'Airline Coverage Completion',
+                    'Administrative Automation FASE 7',
+                    'Agency Web Scraping Expansion'
+                ];
+
+                alert(`${agentNames[index]} Details:\n\nStatus: Completed Successfully\nLast Activity: ${new Date().toLocaleString('es-CO')}\nNext Maintenance: Scheduled`);
+            });
+        });
+
+        // Add responsive behavior
+        function handleResize() {
+            const width = window.innerWidth;
+            const dashboardContainer = document.querySelector('.dashboard-container');
+
+            if (width < 768) {
+                dashboardContainer.style.gridTemplateColumns = '1fr';
+            } else if (width < 1200) {
+                dashboardContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial call
+
+        // ================================================================
+        // EMAIL ANALYTICS - Fetch, Filter, and Render
+        // ================================================================
+
+        const EMAIL_API_URL = 'http://localhost:5000/email-analytics';
+        const EMAIL_REFRESH_INTERVAL = 60000;
+
+        // State
+        let emailDataSource = 'none';
+        let currentEmailData = null;
+        let currentPeriodDays = 30;
+        let customDateFrom = null;
+        let customDateTo = null;
+
+        // Domains to exclude from client list
+        const EXCLUDED_DOMAINS = [
+            'bancolombia.com', 'notificacionesbancolombia.com', 'linkedin.com',
+            'google.com', 'zoho.com', 'zohocalendar.com', 'zohoaccounts.com',
+            'zohowallet.com', 'zohocontracts.com', 'tigo.com.co', 'incasso-online.net',
+            'formspree.io', 'clickup.com', 'intuit.com', 'anthropic.com',
+            'sunbiz-notify.dos.fl.gov', 'fcfiling.com', 'flfilingcenter.com',
+            'puntoscolombia.com', 'sura.com', 'mail.clickup.com'
+        ];
+
+        function isCommercialClient(client) {
+            const email = (client.email || '').toLowerCase();
+            if (email.startsWith('noreply@') || email.startsWith('no-reply@') ||
+                email.startsWith('no-reply-') || email.startsWith('notifications-') ||
+                email.startsWith('messages-noreply@') || email.startsWith('updates-noreply@') ||
+                email.startsWith('invitations@') || email.startsWith('groups-noreply@') ||
+                email.startsWith('newsletters-noreply@') || email.startsWith('workspace-noreply@') ||
+                email.startsWith('alertasynotificaciones@') || email.startsWith('extractos') ||
+                email.startsWith('mail-noreply@') || email.startsWith('team@mail.')) {
+                return false;
+            }
+            for (const domain of EXCLUDED_DOMAINS) {
+                if (email.includes(domain)) return false;
+            }
+            return (client.orders > 0 || client.quotes > 0 || (client.products && client.products.length > 0));
+        }
+
+        function formatDate(dateStr) {
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('es-CO', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        function formatTimestamp(dateStr) {
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('es-CO', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        function getProductTagClass(product) {
+            const p = product.toLowerCase();
+            if (p.includes('hydrangea')) return 'hydrangea';
+            if (p.includes('lepidium')) return 'lepidium';
+            if (p.includes('matricaria')) return 'matricaria';
+            if (p.includes('statice')) return 'statice';
+            return 'hydrangea';
+        }
+
+        function getProductBarClass(product) {
+            const p = product.toLowerCase();
+            if (p.includes('hydrangea')) return 'product-hydrangea';
+            if (p.includes('lepidium')) return 'product-lepidium';
+            if (p.includes('matricaria')) return 'product-matricaria';
+            if (p.includes('statice')) return 'product-statice';
+            return 'product-hydrangea';
+        }
+
+        // Period filter: returns cutoff date based on current filter
+        function getDateCutoff() {
+            if (customDateFrom && customDateTo) {
+                return { from: new Date(customDateFrom), to: new Date(customDateTo + 'T23:59:59') };
+            }
+            const now = new Date();
+            const from = new Date(now);
+            from.setDate(from.getDate() - currentPeriodDays);
+            from.setHours(0, 0, 0, 0);
+            return { from: from, to: now };
+        }
+
+        function filterByDate(items) {
+            const { from, to } = getDateCutoff();
+            return items.filter(item => {
+                const d = new Date(item.date);
+                return d >= from && d <= to;
+            });
+        }
+
+        function getPeriodLabel() {
+            if (customDateFrom && customDateTo) {
+                return customDateFrom + ' a ' + customDateTo;
+            }
+            if (currentPeriodDays === 1) return 'hoy';
+            return 'ultimos ' + currentPeriodDays + ' dias';
+        }
+
+        function setPeriodFilter(days) {
+            currentPeriodDays = days;
+            customDateFrom = null;
+            customDateTo = null;
+            // Update button states
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector('.period-btn[data-days="' + days + '"]');
+            if (activeBtn) activeBtn.classList.add('active');
+            // Clear custom inputs
+            document.getElementById('customDateFrom').value = '';
+            document.getElementById('customDateTo').value = '';
+            // Re-render
+            if (currentEmailData) renderEmailAnalytics(currentEmailData);
+        }
+
+        function setCustomPeriod() {
+            const fromVal = document.getElementById('customDateFrom').value;
+            const toVal = document.getElementById('customDateTo').value;
+            if (!fromVal || !toVal) return;
+            customDateFrom = fromVal;
+            customDateTo = toVal;
+            // Clear preset button states
+            document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+            // Re-render
+            if (currentEmailData) renderEmailAnalytics(currentEmailData);
+        }
+
+        function renderEmailAnalytics(data) {
+            currentEmailData = data;
+            const analytics = data.analytics || {};
+            const summary = analytics.summary || {};
+            const scanTs = data.generated_at ? formatTimestamp(data.generated_at) : '-';
+            const periodLabel = getPeriodLabel();
+            const scanPeriod = data.scan_period_days || 30;
+
+            // Update period info
+            document.getElementById('periodInfo').textContent = 'Mostrando: ' + periodLabel;
+
+            // Card A: Summary KPIs (aggregated - full scan period)
+            document.getElementById('metricTotalEmails').textContent = (summary.total || 0).toLocaleString();
+            document.getElementById('metricOrders').textContent = (summary.orders || 0).toLocaleString();
+            document.getElementById('metricQuotes').textContent = (summary.quotes || 0).toLocaleString();
+            document.getElementById('metricRatio').textContent = (summary.order_to_quote_ratio || 0).toFixed(1) + 'x';
+            document.getElementById('metricProducts').textContent = (summary.with_products_mentioned || 0).toLocaleString();
+
+            const kommet = data.kommet_enrichment || {};
+            document.getElementById('metricKommet').textContent = (kommet.matched || 0).toLocaleString();
+            document.getElementById('metricKommetRate').textContent = (kommet.match_rate || 0) + '% match rate';
+
+            document.getElementById('emailScanDate').textContent = 'Scan: ' + (data.generated_at ? formatDate(data.generated_at) : '-');
+            document.getElementById('summaryTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('summaryPeriodNote').textContent = 'Datos agregados del periodo completo del scan (' + scanPeriod + ' dias)';
+
+            // Card B: Top Clients (aggregated - full scan period)
+            const allClients = analytics.top_clients || [];
+            const commercialClients = allClients.filter(isCommercialClient).slice(0, 10);
+            document.getElementById('clientCount').textContent = commercialClients.length + ' clientes comerciales';
+            document.getElementById('clientsTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('clientsPeriodNote').textContent = 'Datos agregados del periodo completo del scan (' + scanPeriod + ' dias)';
+
+            const clientsBody = document.getElementById('clientsTableBody');
+            if (commercialClients.length === 0) {
+                clientsBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#7f8c8d;">Sin datos de clientes comerciales</td></tr>';
+            } else {
+                clientsBody.innerHTML = commercialClients.map((c, i) => {
+                    const products = (c.products || []).map(p =>
+                        '<span class="product-tag ' + getProductTagClass(p) + '">' + p + '</span>'
+                    ).join(' ');
+                    const bgStyle = i % 2 === 1 ? ' style="background:#f8f9fa;"' : '';
+                    return '<tr' + bgStyle + '>' +
+                        '<td style="font-weight:600;">' + (i + 1) + '</td>' +
+                        '<td style="font-weight:600;">' + (c.name || '-') + '</td>' +
+                        '<td style="font-size:12px;color:#7f8c8d;">' + (c.email || '-') + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + (c.total_emails || 0) + '</td>' +
+                        '<td style="text-align:right;font-weight:600;color:#27ae60;">' + (c.orders || 0) + '</td>' +
+                        '<td style="text-align:right;font-weight:600;color:#3498db;">' + (c.quotes || 0) + '</td>' +
+                        '<td>' + (products || '<span style="color:#bdc3c7;">-</span>') + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            // Card C: Product Demand (aggregated - full scan period)
+            const productDemand = analytics.product_demand || [];
+            const maxMentions = productDemand.length > 0 ? productDemand[0].mentions : 1;
+            const productChart = document.getElementById('productDemandChart');
+            document.getElementById('productsTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('productsPeriodNote').textContent = 'Periodo completo (' + scanPeriod + 'd)';
+
+            if (productDemand.length === 0) {
+                productChart.innerHTML = '<div style="text-align:center;color:#7f8c8d;">Sin datos de productos</div>';
+            } else {
+                productChart.innerHTML = productDemand.map(p => {
+                    const pct = Math.round((p.mentions / maxMentions) * 100);
+                    return '<div class="bar-row">' +
+                        '<div class="bar-label">' + p.product + '</div>' +
+                        '<div class="bar-track">' +
+                        '<div class="bar-fill ' + getProductBarClass(p.product) + '" style="width:' + pct + '%;">' + p.mentions + '</div>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            // Card D: Volume by Day (aggregated - full scan period)
+            const volumeByDay = analytics.volume_by_day || {};
+            const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const dayLabels = { Monday: 'Lun', Tuesday: 'Mar', Wednesday: 'Mie', Thursday: 'Jue', Friday: 'Vie', Saturday: 'Sab', Sunday: 'Dom' };
+            const dayValues = dayOrder.map(d => volumeByDay[d] || 0);
+            const maxDay = Math.max(...dayValues, 1);
+            const dayChart = document.getElementById('volumeByDayChart');
+            document.getElementById('volumeTimestamp').textContent = 'Actualizado: ' + scanTs;
+            document.getElementById('volumePeriodNote').textContent = 'Periodo completo (' + scanPeriod + 'd)';
+
+            dayChart.innerHTML = dayOrder.map((d, i) => {
+                const val = dayValues[i];
+                const pct = Math.round((val / maxDay) * 100);
+                return '<div class="bar-row">' +
+                    '<div class="bar-label">' + dayLabels[d] + '</div>' +
+                    '<div class="bar-track">' +
+                    '<div class="bar-fill day-bar" style="width:' + pct + '%;">' + val + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+
+            // Card E: Recent Orders (FILTERABLE by period)
+            const allOrders = data.recent_orders || [];
+            const allQuotes = data.recent_quotes || [];
+            const filteredOrders = filterByDate(allOrders);
+            const filteredQuotes = filterByDate(allQuotes);
+            const displayOrders = filteredOrders.slice(0, 20);
+
+            document.getElementById('ordersCount').textContent = filteredOrders.length + ' ordenes | ' + filteredQuotes.length + ' cotizaciones (' + periodLabel + ')';
+            document.getElementById('ordersTimestamp').textContent = 'Actualizado: ' + scanTs;
+
+            const ordersBody = document.getElementById('ordersTableBody');
+            if (displayOrders.length === 0) {
+                ordersBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#7f8c8d;">Sin ordenes en el periodo seleccionado (' + periodLabel + ')</td></tr>';
+            } else {
+                ordersBody.innerHTML = displayOrders.map((o, i) => {
+                    const products = (o.products || []).map(p =>
+                        '<span class="product-tag ' + getProductTagClass(p) + '">' + p + '</span>'
+                    ).join(' ');
+                    const kommetBadge = o.has_kommet_match
+                        ? '<span class="kommet-badge yes">Si</span>'
+                        : '<span class="kommet-badge no">No</span>';
+                    const bgStyle = i % 2 === 1 ? ' style="background:#f8f9fa;"' : '';
+                    const subject = (o.subject || '').length > 60 ? o.subject.substring(0, 60) + '...' : (o.subject || '-');
+                    return '<tr' + bgStyle + '>' +
+                        '<td style="white-space:nowrap;font-size:12px;">' + formatDate(o.date) + '</td>' +
+                        '<td style="font-weight:600;">' + (o.from || '-') + '</td>' +
+                        '<td style="font-size:12px;" title="' + (o.subject || '').replace(/"/g, '&quot;') + '">' + subject + '</td>' +
+                        '<td>' + (products || '<span style="color:#bdc3c7;">-</span>') + '</td>' +
+                        '<td style="text-align:center;">' + kommetBadge + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+        }
+
+        async function fetchEmailAnalytics() {
+            try {
+                const response = await fetch(EMAIL_API_URL);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                emailDataSource = 'live';
+                document.getElementById('emailDataStatus').textContent = 'Datos en vivo via Bot API';
+                document.getElementById('emailDataStatus').className = 'email-data-status live';
+                renderEmailAnalytics(data);
+            } catch (apiError) {
+                console.log('Bot API not available, using static fallback data');
+                if (typeof STATIC_EMAIL_DATA !== 'undefined') {
+                    emailDataSource = 'static';
+                    document.getElementById('emailDataStatus').textContent = 'Datos estaticos (bot offline)';
+                    document.getElementById('emailDataStatus').className = 'email-data-status static';
+                    renderEmailAnalytics(STATIC_EMAIL_DATA);
+                } else {
+                    document.getElementById('emailDataStatus').textContent = 'Sin conexion al bot - datos no disponibles';
+                    document.getElementById('emailDataStatus').className = 'email-data-status static';
+                }
+            }
+        }
+
+        // Static fallback data from last scan
+        const STATIC_EMAIL_DATA = {
+            "generated_at": "2026-02-17T03:25:47.674636",
+            "scan_period_days": 30,
+            "analytics": {
+                "total_emails": 1613,
+                "summary": {
+                    "total": 1613, "orders": 228, "quotes": 63, "commercial": 290,
+                    "general": 1323, "with_products_mentioned": 231, "order_to_quote_ratio": 3.62
+                },
+                "top_clients": [
+                    {"email":"no-reply@kometsales.com","name":"Komet Sales","total_emails":271,"orders":41,"quotes":0,"products":["HYDRANGEA","LEPIDIUM","MATRICARIA"]},
+                    {"email":"rivermailer@riverdalefarms.com","name":"RIVERDALE FARMS","total_emails":37,"orders":1,"quotes":27,"products":["HYDRANGEA","LEPIDIUM","MATRICARIA","STATICE"]},
+                    {"email":"operacionesbqt_esperanza@sunshinebouquet.com","name":"Operaciones Bouquetera Esperanza","total_emails":29,"orders":0,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"vrobinson@petalswest.com","name":"The Flower Market","total_emails":27,"orders":27,"quotes":0,"products":[]},
+                    {"email":"reportes_terceros@sunshinebouquet.com","name":"Reportes Terceros","total_emails":25,"orders":14,"quotes":0,"products":["HYDRANGEA","LEPIDIUM"]},
+                    {"email":"mmontoya@sunshinebouquet.com","name":"Mary Montoya","total_emails":23,"orders":0,"quotes":6,"products":["HYDRANGEA"]},
+                    {"email":"stsventarnaya@7flowers.ru","name":"7Flowers (Svetlana)","total_emails":21,"orders":21,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"accounting@makescentsflowers.com","name":"MSF - Accounting","total_emails":20,"orders":20,"quotes":0,"products":[]},
+                    {"email":"tkirshenman@7flowers.ru","name":"7Flowers (Tatiana)","total_emails":17,"orders":17,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"m@impexflowers.com","name":"Impex Flowers","total_emails":13,"orders":0,"quotes":0,"products":["HYDRANGEA"]},
+                    {"email":"noreply@m-flowers.com","name":"mFlowers","total_emails":22,"orders":0,"quotes":0,"products":["HYDRANGEA","MATRICARIA"]}
+                ],
+                "product_demand": [
+                    {"product":"HYDRANGEA","mentions":198},
+                    {"product":"LEPIDIUM","mentions":49},
+                    {"product":"MATRICARIA","mentions":25},
+                    {"product":"STATICE","mentions":19}
+                ],
+                "volume_by_day": {"Monday":388,"Tuesday":285,"Wednesday":199,"Thursday":281,"Friday":379,"Saturday":49,"Sunday":21}
+            },
+            "recent_orders": [
+                {"date":"2026-02-17T03:15:47+00:00","from":"Formspree","subject":"New inquiry from Sky Flowers website","products":[],"has_kommet_match":false},
+                {"date":"2026-02-16T22:33:47+00:00","from":"Logiztik Alliance Group","subject":"Logiztik Alliance Colombia l Important Communication l Rate Increase","products":[],"has_kommet_match":true},
+                {"date":"2026-02-16T20:08:53+00:00","from":"MSF - Accounting","subject":"Order to fly out of Colombia on Friday, Feb 27th","products":[],"has_kommet_match":false},
+                {"date":"2026-02-16T18:02:33+00:00","from":"Allure Farms","subject":"PO #P281505 for Tue, Feb 17 - Sky Flowers - Allure Farms","products":["LEPIDIUM","HYDRANGEA"],"has_kommet_match":true},
+                {"date":"2026-02-16T16:56:51+00:00","from":"MSF - Accounting","subject":"RE: Order to fly out of Colombia on Tuesday, Feb 24th","products":[],"has_kommet_match":false},
+                {"date":"2026-02-16T15:50:55+00:00","from":"Reportes Terceros","subject":"C.I. SUNSHINE BOUQUET COLOMBIA SAS - PO# 1076456","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-16T15:21:57+00:00","from":"7Flowers (Svetlana)","subject":"RE: Women's day Gulf Flowers FZCO orders","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-16T08:45:50+00:00","from":"7Flowers (Tatiana)","subject":"Order Gulf flowers PIT 19/02 Cargex","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-14T16:57:19+00:00","from":"Reportes Terceros","subject":"C.I. SUNSHINE BOUQUET COLOMBIA SAS - PO# 1076454","products":["HYDRANGEA"],"has_kommet_match":false},
+                {"date":"2026-02-14T13:54:57+00:00","from":"Johander Torres","subject":"Ordenes De Compra Semana 2026-08","products":[],"has_kommet_match":false}
+            ],
+            "recent_quotes": [
+                {"date":"2026-02-16T17:08:46-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 07KSSUP Adiciones/Modificaciones/Cancelaciones","products":["LEPIDIUM"]},
+                {"date":"2026-02-13T17:24:35-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 10KSSUP Adiciones/Modificaciones/Cancelaciones","products":["HYDRANGEA","LEPIDIUM","STATICE"]},
+                {"date":"2026-02-13T12:02:36-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 08KSSUP Adiciones/Modificaciones/Cancelaciones","products":["MATRICARIA","LEPIDIUM","STATICE"]},
+                {"date":"2026-02-12T12:40:26-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 16KSSUP Adiciones/Modificaciones/Cancelaciones","products":["HYDRANGEA","LEPIDIUM","STATICE"]},
+                {"date":"2026-02-10T18:00:46+00:00","from":"Mary Montoya","subject":"RE: Solicitud Disponibilidad Hydrangeas","products":["HYDRANGEA"]},
+                {"date":"2026-02-10T17:26:21-05:00","from":"RIVERDALE FARMS","subject":"RIVERDALE FARMS 01KSSUP Adiciones/Modificaciones/Cancelaciones","products":["HYDRANGEA","LEPIDIUM","STATICE"]}
+            ],
+            "kommet_enrichment": {"enriched":true,"total_checked":1613,"matched":337,"match_rate":20.9}
+        };
+
+        // Initialize date inputs with sensible defaults
+        function initDateInputs() {
+            const today = new Date();
+            const thirtyAgo = new Date(today);
+            thirtyAgo.setDate(thirtyAgo.getDate() - 30);
+            document.getElementById('customDateTo').value = today.toISOString().split('T')[0];
+            document.getElementById('customDateFrom').value = thirtyAgo.toISOString().split('T')[0];
+        }
+
+        // ================================================================
+        // PRODUCTION INTELLIGENCE - Fetch and Render BigQuery Data
+        // ================================================================
+
+        const PROD_API_BASE = 'http://localhost:5000/api/produccion';
+        let prodDataSource = 'loading';
+
+        async function fetchProduccionSemanal() {
+            try {
+                const response = await fetch(`${PROD_API_BASE}/semanal?semanas=4`);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+
+                prodDataSource = data.source === 'bigquery' ? 'live' : (data.source === 'cache' ? 'cached' : 'fallback');
+                updateProdDataStatus(prodDataSource);
+                renderProduccionSemanal(data);
+            } catch (error) {
+                console.log('Production API error:', error);
+                prodDataSource = 'fallback';
+                updateProdDataStatus('fallback');
+                renderProduccionSemanal({ status: 'error', data: [], count: 0 });
+            }
+        }
+
+        async function fetchProduccionAlertas() {
+            try {
+                const response = await fetch(`${PROD_API_BASE}/alertas`);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                renderProduccionAlertas(data);
+            } catch (error) {
+                console.log('Alerts API error:', error);
+                renderProduccionAlertas({ status: 'error', data: [], count: 0 });
+            }
+        }
+
+        function updateProdDataStatus(source) {
+            const statusEl = document.getElementById('prodDataStatus');
+            if (source === 'live') {
+                statusEl.textContent = '🟢 Live Data (BigQuery)';
+                statusEl.className = 'prod-data-status live';
+            } else if (source === 'cached') {
+                statusEl.textContent = '🟡 Cached Data';
+                statusEl.className = 'prod-data-status cached';
+            } else {
+                statusEl.textContent = '🔴 Fallback Mode';
+                statusEl.className = 'prod-data-status fallback';
+            }
+        }
+
+        function renderProduccionSemanal(data) {
+            const weeklyData = data.data || [];
+            const timestamp = data.timestamp ? formatTimestamp(data.timestamp) : '-';
+
+            document.getElementById('prodSemanalTimestamp').textContent = 'Actualizado: ' + timestamp;
+            document.getElementById('prodSemanalCount').textContent = weeklyData.length + ' registros';
+
+            // Group by semana_iso and sum tallos
+            const weekMap = {};
+            weeklyData.forEach(row => {
+                const week = row.semana_iso || row.week_iso || 'Unknown';
+                if (!weekMap[week]) weekMap[week] = 0;
+                weekMap[week] += parseInt(row.total_tallos || row.tallos || 0);
+            });
+
+            // Sort weeks and take last 4
+            const weeks = Object.keys(weekMap).sort().slice(-4);
+            const maxTallos = Math.max(...weeks.map(w => weekMap[w]), 1);
+
+            const chartEl = document.getElementById('prodSemanalChart');
+            if (weeks.length === 0) {
+                chartEl.innerHTML = '<div style="text-align:center;color:#7f8c8d;padding:20px;">Sin datos de producción</div>';
+            } else {
+                chartEl.innerHTML = weeks.map(week => {
+                    const tallos = weekMap[week];
+                    const pct = Math.round((tallos / maxTallos) * 100);
+                    return '<div class="prod-week-bar">' +
+                        '<div class="prod-week-label">Sem ' + week + '</div>' +
+                        '<div class="prod-week-track">' +
+                        '<div class="prod-week-fill" style="width:' + pct + '%;">' +
+                        tallos.toLocaleString() + ' tallos</div>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        function renderProduccionAlertas(data) {
+            const alerts = data.data || [];
+            const alertsContainer = document.getElementById('prodAlertasContainer');
+
+            document.getElementById('prodAlertasCount').textContent = alerts.length;
+
+            if (alerts.length === 0) {
+                alertsContainer.innerHTML = '<div style="text-align:center;color:#27ae60;padding:16px;">✅ No hay alertas fitosanitarias</div>';
+            } else {
+                alertsContainer.innerHTML = alerts.slice(0, 5).map(alert => {
+                    const camaId = alert.cama_id || 'N/A';
+                    const sede = alert.sede_id || '';
+                    const mensaje = alert.alerta_enfermedad ? '🦠 Alerta enfermedad' :
+                                   alert.alerta_plaga ? '🐛 Alerta plaga' : '⚠️ Alerta';
+                    return '<div class="prod-alert-card">' +
+                        '<strong>' + camaId + '</strong> (' + sede + ') - ' + mensaje +
+                        '</div>';
+                }).join('');
+                if (alerts.length > 5) {
+                    alertsContainer.innerHTML += '<div style="text-align:center;color:#7f8c8d;padding:8px;font-size:12px;">+' + (alerts.length - 5) + ' alertas más</div>';
+                }
+            }
+        }
+
+        // Fetch email analytics on page load and refresh every 60s
+        document.addEventListener('DOMContentLoaded', function() {
+            initDateInputs();
+            fetchEmailAnalytics();
+            setInterval(fetchEmailAnalytics, EMAIL_REFRESH_INTERVAL);
+            // AWB Tracking
+            fetchAWBTracking();
+            setInterval(fetchAWBTracking, 60000);
+            // Production Intelligence
+            fetchProduccionSemanal();
+            fetchProduccionAlertas();
+            setInterval(fetchProduccionSemanal, 300000); // Every 5 minutes
+            setInterval(fetchProduccionAlertas, 300000);
+            // AI Persona
+            fetchAIPersona();
+            setInterval(fetchAIPersona, 60000);
+
+            // Software Renzo
+            initRenzoSemanas();
+            fetchRenzoResumen(renzoSemanaActual);
+            fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+            setInterval(() => {
+                fetchRenzoResumen(renzoSemanaActual);
+                fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+            }, 600000); // Refresca cada 10 min
+        });
+
+        // ================================================================
+        // AWB LOGISTICS TRACKING - Fetch and Render
+        // ================================================================
+
+        const AWB_API_URL = 'http://localhost:5000/awb-tracking';
+
+        function awbStatusClass(label) {
+            return (label || '').toLowerCase().replace(/\s+/g, '-');
+        }
+
+        function renderAWBTracking(data) {
+            const summary = data.summary || {};
+            const awbs = data.awbs || [];
+            const alerts = data.alerts || [];
+            const dailyVolume = data.daily_volume || [];
+            const byStatus = summary.by_status || {};
+            const scanTs = data.generated_at ? formatTimestamp(data.generated_at) : '-';
+
+            // Card F: Summary KPIs
+            document.getElementById('awbMetricTotal').textContent = (summary.total_awbs_active || 0).toLocaleString();
+            document.getElementById('awbMetricPieces').textContent = (summary.total_pieces || 0).toLocaleString();
+            document.getElementById('awbMetricPiecesReceived').textContent = (summary.total_pieces_received || 0).toLocaleString() + ' recibidas';
+            document.getElementById('awbMetricDelivery').textContent = (summary.delivery_rate_pct || 0).toFixed(1) + '%';
+            document.getElementById('awbMetricCarriers').textContent = (summary.carriers_active || 0);
+            document.getElementById('awbMetricAlerts').textContent = (summary.alerts_count || 0);
+            document.getElementById('awbMetricAPI').textContent = (data.api_calls_used || 0) + ' calls';
+            document.getElementById('awbScanInfo').textContent = 'Scan: ' + (data.scan_period_days || 7) + ' dias';
+            document.getElementById('awbTimestamp').textContent = 'Actualizado: ' + scanTs;
+
+            // Card G: Pipeline de Estado
+            const pipelineOrder = [
+                { key: 'pending', label: 'Pending' },
+                { key: 'farm_shipped', label: 'Farm Shipped' },
+                { key: 'in_transit', label: 'In Transit' },
+                { key: 'arrived', label: 'Arrived' },
+                { key: 'customs', label: 'Customs' },
+                { key: 'delivered', label: 'Delivered' },
+            ];
+            const totalAWBs = summary.total_awbs_active || 1;
+            const pipelineChart = document.getElementById('awbPipelineChart');
+            pipelineChart.innerHTML = pipelineOrder.map(s => {
+                const count = byStatus[s.key] || 0;
+                const pct = Math.max(Math.round((count / totalAWBs) * 100), count > 0 ? 8 : 0);
+                return '<div class="awb-pipeline-bar">' +
+                    '<div class="awb-pipeline-label">' + s.label + '</div>' +
+                    '<div class="awb-pipeline-track">' +
+                    '<div class="awb-pipeline-fill status-' + awbStatusClass(s.label) + '" style="width:' + pct + '%;">' + count + '</div>' +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+
+            // Card H: Volumen Diario
+            const volumeChart = document.getElementById('awbVolumeChart');
+            if (dailyVolume.length === 0) {
+                volumeChart.innerHTML = '<div style="text-align:center;color:#7f8c8d;">Sin datos de volumen</div>';
+            } else {
+                const maxPieces = Math.max(...dailyVolume.map(d => d.pieces_shipped || 0), 1);
+                const recentDays = dailyVolume.slice(0, 7);
+                volumeChart.innerHTML = recentDays.map(d => {
+                    const pct = Math.round(((d.pieces_shipped || 0) / maxPieces) * 100);
+                    const dateLabel = d.date || '-';
+                    return '<div class="awb-daily-bar">' +
+                        '<div class="awb-daily-label">' + dateLabel + '</div>' +
+                        '<div class="awb-daily-track">' +
+                        '<div class="awb-daily-fill" style="width:' + pct + '%;">' + (d.pieces_shipped || 0) + '</div>' +
+                        '</div>' +
+                        '<div style="font-size:11px;color:#7f8c8d;min-width:40px;">' + (d.awbs_shipped || 0) + ' AWBs</div>' +
+                        '</div>';
+                }).join('');
+            }
+
+            // Card I: AWBs Table
+            document.getElementById('awbTableCount').textContent = awbs.length + ' AWBs';
+            const tableBody = document.getElementById('awbTableBody');
+            if (awbs.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#7f8c8d;">Sin AWBs activos</td></tr>';
+            } else {
+                tableBody.innerHTML = awbs.map((a, i) => {
+                    const delayClass = a.is_delayed ? ' awb-delayed' : '';
+                    const statusBadge = '<span class="awb-status-badge ' + awbStatusClass(a.status_label) + '">' + (a.status_label || '-') + '</span>';
+                    const pct = a.delivery_pct || 0;
+                    const progressBar = '<div class="awb-progress-bar"><div class="awb-progress-fill" style="width:' + pct + '%;"></div></div>' +
+                        '<div style="font-size:10px;color:#7f8c8d;text-align:center;">' + pct.toFixed(0) + '%</div>';
+                    const customers = (a.customers || []).slice(0, 2).join(', ') || '-';
+                    const piecesText = (a.pieces_received || 0) + '/' + (a.pieces || 0);
+                    return '<tr class="' + delayClass + '">' +
+                        '<td style="font-weight:600;white-space:nowrap;">' + (a.awb || '-') + '</td>' +
+                        '<td>' + (a.origin || '-') + '</td>' +
+                        '<td style="white-space:nowrap;font-size:12px;">' + (a.ship_date || '-') + '</td>' +
+                        '<td style="font-size:12px;">' + (a.carrier_name || '-') + '</td>' +
+                        '<td>' + statusBadge + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + piecesText + '</td>' +
+                        '<td style="min-width:100px;">' + progressBar + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + (a.days_since_ship || 0) + '</td>' +
+                        '<td style="font-size:12px;">' + customers + '</td>' +
+                        '</tr>';
+                }).join('');
+            }
+
+            // Card J: Alerts
+            const alertsCard = document.getElementById('awbAlertsCard');
+            if (alerts.length === 0) {
+                alertsCard.style.display = 'none';
+            } else {
+                alertsCard.style.display = '';
+                document.getElementById('awbAlertsCount').textContent = alerts.length + ' alertas';
+                const alertsContainer = document.getElementById('awbAlertsContainer');
+                alertsContainer.innerHTML = alerts.map(a => {
+                    const sevClass = (a.severity || 'medium').toLowerCase();
+                    return '<div class="awb-alert-card severity-' + sevClass + '">' +
+                        '<span class="awb-severity-badge ' + sevClass + '">' + (a.severity || 'INFO') + '</span>' +
+                        '<div class="awb-alert-message">' + (a.message || '') + '</div>' +
+                        '</div>';
+                }).join('');
+            }
+        }
+
+        // ================================================================
+        // AI PERSONA - Fetch and Render
+        // ================================================================
+
+        const AI_PERSONA_API_URL = 'http://localhost:5000/ai-persona-stats';
+        const BAILEYS_API_URL = 'http://localhost:3001/status';
+
+        function renderAIPersona(data) {
+            const summary = data.summary || {};
+            const hourly = data.hourly_volume || [];
+            const activity = data.recent_activity || [];
+            const health = data.health || {};
+            const scanTs = data.generated_at ? formatTimestamp(data.generated_at) : '-';
+
+            // Card K: Summary KPIs
+            document.getElementById('aiMetricToday').textContent = (summary.messages_today || 0).toLocaleString();
+            document.getElementById('aiMetricLatency').textContent = (summary.avg_latency_sec || 0).toFixed(1) + 's';
+            document.getElementById('aiMetricConvos').textContent = (summary.active_conversations || 0);
+            document.getElementById('aiMetricTotal').textContent = (summary.total_responses || 0).toLocaleString();
+            document.getElementById('aiMetricErrors').textContent = (summary.total_errors || 0);
+            document.getElementById('aiMetricChroma').textContent = (health.chromadb_documents || 0).toLocaleString();
+            document.getElementById('aiTimestamp').textContent = 'Actualizado: ' + scanTs;
+
+            // Card L: Hourly Volume
+            const volumeChart = document.getElementById('aiVolumeChart');
+            if (hourly.length === 0) {
+                volumeChart.innerHTML = '<div style="text-align:center;color:#7f8c8d;">Sin datos de volumen</div>';
+            } else {
+                const maxH = Math.max(...hourly.map(h => h.count || 0), 1);
+                volumeChart.innerHTML = hourly.map(h => {
+                    const pct = Math.round(((h.count || 0) / maxH) * 100);
+                    return '<div class="ai-hourly-bar">' +
+                        '<div class="ai-hourly-label">' + (h.hour || '-') + '</div>' +
+                        '<div class="ai-hourly-track">' +
+                        '<div class="ai-hourly-fill" style="width:' + (h.count > 0 ? Math.max(pct, 8) : 0) + '%;">' + (h.count || 0) + '</div>' +
+                        '</div></div>';
+                }).join('');
+            }
+
+            // Card N: Health
+            function setHealthDot(id, infoId, ok, label) {
+                const dot = document.getElementById(id);
+                const info = document.getElementById(infoId);
+                dot.className = 'ai-health-dot ' + (ok ? 'ok' : 'err');
+                info.textContent = label;
+            }
+
+            const llmConfigured = health.claude_configured || health.openai_configured;
+            setHealthDot('aiHealthLLM', 'aiHealthLLMInfo', llmConfigured, health.llm_provider || 'none');
+            setHealthDot('aiHealthChroma', 'aiHealthChromaInfo', health.chromadb_status === 'ready',
+                health.chromadb_documents + ' docs');
+            setHealthDot('aiHealthEngine', 'aiHealthEngineInfo', true, 'Online');
+
+            if (health.warning) {
+                setHealthDot('aiHealthLLM', 'aiHealthLLMInfo', false, health.warning.substring(0, 30));
+            }
+
+            // Card M: Recent Activity
+            document.getElementById('aiActivityCount').textContent = activity.length + ' interacciones';
+            const actBody = document.getElementById('aiActivityBody');
+            if (activity.length === 0) {
+                actBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#7f8c8d;">Sin actividad reciente</td></tr>';
+            } else {
+                actBody.innerHTML = activity.slice().reverse().slice(0, 20).map((a, i) => {
+                    const timeStr = a.timestamp ? new Date(a.timestamp).toLocaleTimeString('es-CO', {hour:'2-digit',minute:'2-digit'}) : '-';
+                    const bgStyle = i % 2 === 1 ? ' style="background:#f8f9fa;"' : '';
+                    return '<tr' + bgStyle + '>' +
+                        '<td style="white-space:nowrap;font-size:12px;">' + timeStr + '</td>' +
+                        '<td style="font-weight:600;">' + (a.contact || '-') + '</td>' +
+                        '<td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (a.message_preview || '-') + '</td>' +
+                        '<td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (a.response_preview || '-') + '</td>' +
+                        '<td style="text-align:right;font-weight:600;">' + (a.latency || 0) + 's</td>' +
+                        '</tr>';
+                }).join('');
+            }
+        }
+
+        async function fetchAIPersona() {
+            try {
+                const response = await fetch(AI_PERSONA_API_URL);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                if (data.status === 'offline') throw new Error('AI Engine offline');
+                document.getElementById('aiDataStatus').textContent = 'En vivo via AI Engine';
+                document.getElementById('aiDataStatus').style.color = '#27ae60';
+                renderAIPersona(data);
+            } catch (err) {
+                console.log('AI Persona API not available:', err.message);
+                document.getElementById('aiDataStatus').textContent = 'Offline - iniciar AI Engine';
+                document.getElementById('aiDataStatus').style.color = '#e74c3c';
+            }
+
+            // Check Baileys status separately
+            try {
+                const bResp = await fetch(BAILEYS_API_URL);
+                if (bResp.ok) {
+                    const bData = await bResp.json();
+                    const dot = document.getElementById('aiHealthBaileys');
+                    const info = document.getElementById('aiHealthBaileysInfo');
+                    dot.className = 'ai-health-dot ' + (bData.connection === 'connected' ? 'ok' : 'warn');
+                    info.textContent = bData.connection || 'unknown';
+                }
+            } catch (e) {
+                const dot = document.getElementById('aiHealthBaileys');
+                const info = document.getElementById('aiHealthBaileysInfo');
+                dot.className = 'ai-health-dot err';
+                info.textContent = 'Offline';
+            }
+        }
+
+        async function fetchAWBTracking() {
+            try {
+                const response = await fetch(AWB_API_URL);
+                if (!response.ok) throw new Error('API returned ' + response.status);
+                const data = await response.json();
+                document.getElementById('awbDataStatus').textContent = 'Datos en vivo via Bot API';
+                document.getElementById('awbDataStatus').style.color = '#27ae60';
+                renderAWBTracking(data);
+            } catch (err) {
+                console.log('AWB API not available:', err.message);
+                document.getElementById('awbDataStatus').textContent = 'Sin conexion - ejecutar scanner';
+                document.getElementById('awbDataStatus').style.color = '#e74c3c';
+            }
+        }
+        // ================================================================
+        // SOFTWARE RENZO — Proyección de Mano de Obra
+        // ================================================================
+
+        const RENZO_API_BASE = 'http://localhost:5000/api/software-renzo';
+        let renzoSemanaActual = '';
+        let renzoSedeActual = '';
+
+        // ── Helpers ISO week ────────────────────────────────────────────
+        function getISOWeekCode(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dow = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dow);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+            return `${d.getUTCFullYear()}${String(weekNo).padStart(2, '0')}`;
+        }
+
+        function getNextISOWeek() {
+            const d = new Date();
+            d.setDate(d.getDate() + 7);
+            return getISOWeekCode(d);
+        }
+
+        function generateRenzoSemanas() {
+            const weeks = [];
+            const today = new Date();
+            for (let i = -2; i <= 8; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + i * 7);
+                weeks.push(getISOWeekCode(d));
+            }
+            return [...new Set(weeks)];
+        }
+
+        function isoWeekLabel(code) {
+            const year = parseInt(code.slice(0, 4));
+            const week = parseInt(code.slice(4));
+            const jan4 = new Date(year, 0, 4);
+            const mon = new Date(jan4);
+            mon.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1 + (week - 1) * 7);
+            const fri = new Date(mon);
+            fri.setDate(mon.getDate() + 4);
+            const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+            return `S${week} · ${mon.getDate()} ${meses[mon.getMonth()]}–${fri.getDate()} ${meses[fri.getMonth()]}`;
+        }
+
+        function confPillHtml(conf) {
+            const cls = { ALTA: 'sem-verde', MEDIA: 'sem-amarillo', BAJA: 'sem-rojo' };
+            const label = conf || 'BAJA';
+            return `<span class="sem-pill ${cls[label] || 'sem-gris'}">${label}</span>`;
+        }
+
+        // ── Init ────────────────────────────────────────────────────────
+        function initRenzoSemanas() {
+            renzoSemanaActual = getNextISOWeek();
+            const semanas = generateRenzoSemanas();
+            const sel = document.getElementById('renzoSemanaSelect');
+            sel.innerHTML = semanas.map(s =>
+                `<option value="${s}"${s === renzoSemanaActual ? ' selected' : ''}>${isoWeekLabel(s)}</option>`
+            ).join('');
+        }
+
+        // ── Render ──────────────────────────────────────────────────────
+        function renderRenzoResumen(rows, timestamp) {
+            const tbody = document.getElementById('renzoResumenBody');
+            document.getElementById('renzoResumenCount').textContent = rows.length + ' sedes';
+            document.getElementById('renzoResumenTimestamp').textContent = 'Actualizado: ' + (timestamp ? timestamp.slice(11,19) : '-');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="renzo-no-data">Sin datos para esta semana</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(r => `<tr>
+                <td><strong>${r.sede_id}</strong></td>
+                <td class="num">${r.total_labores ?? '-'}</td>
+                <td class="num">${r.total_personas ?? '-'}</td>
+                <td class="num">${r.total_horas != null ? r.total_horas + 'h' : '-'}</td>
+                <td>${confPillHtml(r.confianza_min)}</td>
+            </tr>`).join('');
+        }
+
+        function renderRenzoDetalle(rows, timestamp) {
+            const tbody = document.getElementById('renzoDetalleBody');
+            document.getElementById('renzoDetalleCount').textContent = rows.length + ' labores';
+            document.getElementById('renzoDetalleTimestamp').textContent = 'Actualizado: ' + (timestamp ? timestamp.slice(11,19) : '-');
+            if (!rows.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="renzo-no-data">Sin datos</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(r => `<tr>
+                <td>${r.labor_nombre ?? '-'}</td>
+                <td style="font-size:11px;color:#7f8c8d;">${r.tipo_labor ?? '-'}</td>
+                <td class="num">${r.camas_involucradas ?? '-'}</td>
+                <td class="num">${r.personas_requeridas ?? '-'}</td>
+                <td class="num">${r.horas_requeridas != null ? r.horas_requeridas + 'h' : '-'}</td>
+                <td>${confPillHtml(r.confianza_proyeccion)}</td>
+            </tr>`).join('');
+        }
+
+        // ── Fetch ───────────────────────────────────────────────────────
+        async function fetchRenzoResumen(semana) {
+            try {
+                const resp = await fetch(`${RENZO_API_BASE}/resumen?semana=${semana}`);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                if (data.status === 'error') throw new Error(data.error);
+                document.getElementById('renzoDataStatus').textContent = 'En vivo · BigQuery';
+                document.getElementById('renzoDataStatus').style.color = '#27ae60';
+                renderRenzoResumen(data.data || [], data.timestamp);
+            } catch (err) {
+                document.getElementById('renzoDataStatus').textContent = 'Sin conexión · iniciar bot';
+                document.getElementById('renzoDataStatus').style.color = '#e74c3c';
+                document.getElementById('renzoResumenBody').innerHTML =
+                    '<tr><td colspan="5" class="renzo-no-data">Bot offline · ' + err.message + '</td></tr>';
+            }
+        }
+
+        async function fetchRenzoDetalle(semana, sede) {
+            try {
+                let url = `${RENZO_API_BASE}/detalle?semana=${semana}`;
+                if (sede) url += `&sede=${sede}`;
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                if (data.status === 'error') throw new Error(data.error);
+                renderRenzoDetalle(data.data || [], data.timestamp);
+            } catch (err) {
+                document.getElementById('renzoDetalleBody').innerHTML =
+                    '<tr><td colspan="6" class="renzo-no-data">Error: ' + err.message + '</td></tr>';
+            }
+        }
+
+        function onRenzoSemanaChange() {
+            renzoSemanaActual = document.getElementById('renzoSemanaSelect').value;
+            fetchRenzoResumen(renzoSemanaActual);
+            fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+        }
+
+        function onRenzoSedeChange() {
+            renzoSedeActual = document.getElementById('renzoSedeSelect').value;
+            fetchRenzoDetalle(renzoSemanaActual, renzoSedeActual);
+        }
+
+    </script>
+</body>
+</html>
