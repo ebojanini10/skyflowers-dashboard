@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Flowers — To-Do Automatización</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 100%);
+            border-bottom: 3px solid #e74c8b;
+            padding: 40px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 26px; color: #fff; margin-bottom: 6px; }
+        .hero p { color: #667; font-size: 14px; }
+        .hero .fecha {
+            display: inline-block;
+            margin-top: 12px;
+            background: rgba(231,76,139,0.15);
+            border: 1px solid rgba(231,76,139,0.3);
+            color: #e74c8b;
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            padding: 24px 40px;
+            background: #12161f;
+            border-bottom: 1px solid #1a1f2e;
+            flex-wrap: wrap;
+        }
+        .stat { text-align: center; }
+        .stat .val { font-size: 28px; font-weight: 700; }
+        .stat .lbl { font-size: 11px; color: #667; text-transform: uppercase; letter-spacing: 0.5px; }
+        .val.red { color: #e74c3c; }
+        .val.yellow { color: #f39c12; }
+        .val.green { color: #27ae60; }
+        .val.blue { color: #3498db; }
+
+        .container { max-width: 860px; margin: 0 auto; padding: 36px 24px; }
+
+        .section { margin-bottom: 40px; }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1a1f2e;
+        }
+        .section-title h2 { font-size: 16px; color: #fff; font-weight: 600; }
+        .section-title .cnt {
+            margin-left: auto;
+            font-size: 12px;
+            color: #667;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            user-select: none;
+        }
+        .todo-item:hover { border-color: #3a4560; }
+        .todo-item.done {
+            opacity: 0.45;
+            border-color: #1a2a1a;
+            background: #141a14;
+        }
+        .todo-item.done .todo-title { text-decoration: line-through; color: #556; }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid #3a4560;
+            flex-shrink: 0;
+            margin-top: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .todo-item.done .checkbox {
+            background: #27ae60;
+            border-color: #27ae60;
+            color: #fff;
+        }
+
+        .todo-body { flex: 1; }
+        .todo-header { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+        .todo-title { font-size: 14px; color: #e0e0e0; font-weight: 500; }
+        .todo-desc { font-size: 12px; color: #667; }
+        .todo-who {
+            margin-top: 6px;
+            font-size: 11px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .tag-hoy   { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+        .tag-prox  { background: rgba(243,156,18,0.2); color: #f39c12; border: 1px solid rgba(243,156,18,0.3); }
+        .tag-luego { background: rgba(52,152,219,0.2); color: #3498db; border: 1px solid rgba(52,152,219,0.3); }
+        .tag-done  { background: rgba(39,174,96,0.2); color: #27ae60; border: 1px solid rgba(39,174,96,0.3); }
+
+        .who-badge {
+            background: #252d40;
+            padding: 1px 8px;
+            border-radius: 8px;
+            color: #556;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 28px;
+            border-top: 1px solid #1a1f2e;
+            color: #3a4560;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>🌸 Sky Flowers — To-Do Automatización</h1>
+    <p>Todo lo que falta para que el sistema quede completo y corriendo solo</p>
+    <span class="fecha">Marzo 2026</span>
+</div>
+
+<div class="stats">
+    <div class="stat"><div class="val red" id="cnt-hoy">-</div><div class="lbl">Para hoy</div></div>
+    <div class="stat"><div class="val yellow" id="cnt-prox">-</div><div class="lbl">Próximas semanas</div></div>
+    <div class="stat"><div class="val blue" id="cnt-luego">-</div><div class="lbl">Después</div></div>
+    <div class="stat"><div class="val green" id="cnt-done">-</div><div class="lbl">Listos ✅</div></div>
+</div>
+
+<div class="container">
+
+    <!-- HOY -->
+    <div class="section">
+        <div class="section-title">
+            <span>🔴</span>
+            <h2>Para esta semana</h2>
+            <span class="cnt" id="label-hoy"></span>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Reiniciar wa-sender y mandarle el documento a Valentina</span>
+                    <span class="tag tag-hoy">Hoy</span>
+                </div>
+                <div class="todo-desc">Ctrl+C en la terminal del wa-sender → node index.js → esperar "Client ready" → enviar mensaje + bigquery_estado.html</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Subir los cambios del modelo a BigQuery</span>
+                    <span class="tag tag-hoy">Hoy</span>
+                </div>
+                <div class="todo-desc">Correr <code style="background:#252d40;padding:1px 6px;border-radius:4px;font-size:11px;">python subir_bigquery_v2.py --con-vistas</code> para que vw_demanda_semanal quede con los fixes de fumigación y riego</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Calibrar estándares de labor faltantes</span>
+                    <span class="tag tag-hoy">Hoy</span>
+                </div>
+                <div class="todo-desc">Riego, Fertilización, Desmalezar, Subida de mallas, Deshijar — necesito que me digas cuántas personas hacen cada una en SKY7. Con ese dato derivo el rendimiento y aparecen con personas en el plan de supervisores</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano → datos de finca</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Validar el plan de la semana 10 con supervisores</span>
+                    <span class="tag tag-hoy">Hoy</span>
+                </div>
+                <div class="todo-desc">Mandar el plan a todos los supervisores (no solo Alex) y verificar que los datos de labores y camas sean correctos. Si hay errores, ajustar estándares o el calendario</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Supervisores</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PRÓXIMAS SEMANAS -->
+    <div class="section">
+        <div class="section-title">
+            <span>🟡</span>
+            <h2>Próximas 2–3 semanas</h2>
+            <span class="cnt" id="label-prox"></span>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Conectar AppSheets a BigQuery — sincronización nocturna</span>
+                    <span class="tag tag-prox">Próximo</span>
+                </div>
+                <div class="todo-desc">Script Python que corre cada noche y sube las filas nuevas de los 4 AppSheets (Siembras, Recepción, Monitoreo, Labores) a BigQuery. Sin esto los datos se van quedando viejos</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + código</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Pedirle a Juan Fernando la tabla fact_conteo del SQL Server</span>
+                    <span class="tag tag-prox">Próximo</span>
+                </div>
+                <div class="todo-desc">Es el conteo de plantas después de poda. Sin este dato la proyección de cosecha tiene baja confianza. Juan Fernando la tiene en SQL Server (RENZO DB)</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano → Juan Fernando</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Crear formulario AppSheet para fact_plan_labores</span>
+                    <span class="tag tag-prox">Próximo</span>
+                </div>
+                <div class="todo-desc">Un formulario simple donde el supervisor aprueba o ajusta el plan proyectado cada semana. Activa la comparación Plan vs Real en el dashboard y el semáforo de cumplimiento</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Valentina</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Configurar envío automático de planes los domingos</span>
+                    <span class="tag tag-prox">Próximo</span>
+                </div>
+                <div class="todo-desc">Task Scheduler de Windows: todos los domingos a las 6pm corre automáticamente <code style="background:#252d40;padding:1px 6px;border-radius:4px;font-size:11px;">python enviar_plan_supervisores.py</code> y le llega el plan a los 8 supervisores sin hacer nada</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Completar dim_sedes — hectáreas y coordenadas GPS</span>
+                    <span class="tag tag-prox">Próximo</span>
+                </div>
+                <div class="todo-desc">Las 7 fincas no tienen hectáreas totales ni coordenadas. Necesario para métricas de densidad y visualización en mapa. Datos disponibles en el KML de las fincas</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano → datos finca</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Conectar el App de Almacén de Steven a BigQuery</span>
+                    <span class="tag tag-prox">Próximo</span>
+                </div>
+                <div class="todo-desc">Las salidas de insumos con centros de costo. Necesario para calcular el costo real por tallo cortado y el P&L por sede. Steven es muy organizado y entiende de tecnología — buen aliado</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Steven</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DESPUÉS -->
+    <div class="section">
+        <div class="section-title">
+            <span>🔵</span>
+            <h2>Después (1–2 meses)</h2>
+            <span class="cnt" id="label-luego"></span>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Digitalizar base de proveedores de Ramiro</span>
+                    <span class="tag tag-luego">Después</span>
+                </div>
+                <div class="todo-desc">~40 proveedores en dim_proveedores. Necesario para el módulo de compras y para cruzar costos de insumos con las labores. Ramiro no es el más riguroso — conviene que alguien más lo supervise</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Ramiro</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Conectar Gestión Humana — ingresos y retiros automáticos</span>
+                    <span class="tag tag-luego">Después</span>
+                </div>
+                <div class="todo-desc">Cuando Luisa registra un ingreso o retiro que dim_empleados se actualice sola. Hoy hay que hacerlo manualmente y puede tener personas retiradas o faltar gente nueva</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Luisa</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Conectar World Office (Vanessa) a BigQuery</span>
+                    <span class="tag tag-luego">Después</span>
+                </div>
+                <div class="todo-desc">Cruzar la contabilidad con los datos de producción. P&L real por sede, costo por tallo, margen por variedad. Es el análisis financiero más poderoso del sistema</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Vanessa + Juan Fernando</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Agregar restricciones de programación al plan semanal</span>
+                    <span class="tag tag-luego">Después</span>
+                </div>
+                <div class="todo-desc">Fumigación bloquea otras labores ese día, riego debe ir antes de fumigación, no fumigar en finca con día de corte. Hoy el plan no tiene estas reglas</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Renzo</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Dashboard conectado al servidor — siempre disponible</span>
+                    <span class="tag tag-luego">Después</span>
+                </div>
+                <div class="todo-desc">Hoy el dashboard vive en una PC local. Subirlo a un servidor (o GitHub Pages con backend en la nube) para que Valentina, Felipe y el resto puedan verlo desde cualquier lugar sin que nadie tenga que tener el bot corriendo</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano + Juan Fernando</span></div>
+            </div>
+        </div>
+
+        <div class="todo-item" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Módulo de plan de eficiencia para las 6 monitoras</span>
+                    <span class="tag tag-luego">Después</span>
+                </div>
+                <div class="todo-desc">Las monitoras recorren fincas sin ruta optimizada. Con los datos de monitoreo en BigQuery se puede generar la ruta óptima por finca y reducir el tiempo de recorrida</div>
+                <div class="todo-who"><span class="who-badge">👤 Emiliano</span></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- YA LISTOS -->
+    <div class="section">
+        <div class="section-title">
+            <span>✅</span>
+            <h2>Ya listos</h2>
+            <span class="cnt" id="label-done"></span>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Modelo estrella v2 en BigQuery (7 dims + 5 hechos)</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">124k+ registros históricos cargados — siembras, labores, recepción, monitoreo</div>
+            </div>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">11 vistas analíticas activas en BigQuery</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">Producción semanal, ocupación, fitosanidad, rendimiento, proyección de corte, Software Renzo y más</div>
+            </div>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">vw_demanda_semanal — proyección automática de mano de obra</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">Cruza calendario × camas activas × estándares → personas requeridas por semana × sede × labor</div>
+            </div>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">WhatsApp — envío de plan semanal a 8 supervisores</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">Mensaje personalizado por supervisor con labores, camas y personas requeridas. Probado con Alex</div>
+            </div>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Fumigación calibrada — 600 m²/h × 8h/semana</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">SKY7 = 4 personas de fumigación ✓ Validado con datos reales de campo</div>
+            </div>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Dashboard Software Renzo con proyección semanal</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">Muestra personas requeridas, horas y confianza por sede y labor. Semana dinámica (próxima semana automático)</div>
+            </div>
+        </div>
+
+        <div class="todo-item done" onclick="toggle(this)">
+            <div class="checkbox">✓</div>
+            <div class="todo-body">
+                <div class="todo-header">
+                    <span class="todo-title">Documento estado BigQuery para Valentina</span>
+                    <span class="tag tag-done">Listo</span>
+                </div>
+                <div class="todo-desc">bigquery_estado.html — explica el modelo, las tablas, las vistas y qué falta en lenguaje simple</div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="footer">
+    Sky Flowers · Automatización v2 · Actualizado: marzo 2026
+</div>
+
+<script>
+    function toggle(el) {
+        el.classList.toggle('done');
+        const cb = el.querySelector('.checkbox');
+        cb.textContent = el.classList.contains('done') ? '✓' : '';
+        updateCounts();
+        saveState();
+    }
+
+    function updateCounts() {
+        const all = document.querySelectorAll('.todo-item');
+        let hoy = 0, prox = 0, luego = 0, done = 0;
+        all.forEach(el => {
+            const isDone = el.classList.contains('done');
+            if (isDone) { done++; return; }
+            const tag = el.querySelector('.tag');
+            if (!tag) return;
+            if (tag.classList.contains('tag-hoy'))  hoy++;
+            if (tag.classList.contains('tag-prox')) prox++;
+            if (tag.classList.contains('tag-luego')) luego++;
+        });
+        document.getElementById('cnt-hoy').textContent  = hoy;
+        document.getElementById('cnt-prox').textContent = prox;
+        document.getElementById('cnt-luego').textContent = luego;
+        document.getElementById('cnt-done').textContent = done;
+        document.getElementById('label-hoy').textContent  = hoy + ' pendientes';
+        document.getElementById('label-prox').textContent = prox + ' pendientes';
+        document.getElementById('label-luego').textContent = luego + ' pendientes';
+        document.getElementById('label-done').textContent = done + ' completados';
+    }
+
+    function saveState() {
+        const items = document.querySelectorAll('.todo-item');
+        const state = [...items].map(el => el.classList.contains('done'));
+        localStorage.setItem('skyflowers-todo', JSON.stringify(state));
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem('skyflowers-todo');
+        if (!saved) return;
+        const state = JSON.parse(saved);
+        const items = document.querySelectorAll('.todo-item');
+        items.forEach((el, i) => {
+            if (state[i]) {
+                el.classList.add('done');
+                el.querySelector('.checkbox').textContent = '✓';
+            }
+        });
+    }
+
+    loadState();
+    updateCounts();
+</script>
+</body>
+</html>
