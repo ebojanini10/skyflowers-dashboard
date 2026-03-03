@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Flowers — BigQuery: Estado y Hoja de Ruta</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 0;
+        }
+
+        /* ── Header ── */
+        .hero {
+            background: linear-gradient(135deg, #1a1f2e 0%, #0f1117 100%);
+            border-bottom: 3px solid #e74c8b;
+            padding: 48px 40px 36px;
+            text-align: center;
+        }
+        .hero .logo { font-size: 36px; margin-bottom: 8px; }
+        .hero h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .hero p {
+            color: #8899aa;
+            font-size: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .hero .fecha {
+            display: inline-block;
+            margin-top: 16px;
+            background: rgba(231,76,139,0.15);
+            border: 1px solid rgba(231,76,139,0.3);
+            color: #e74c8b;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        /* ── Layout ── */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* ── Secciones ── */
+        .section {
+            margin-bottom: 48px;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #1e2535;
+        }
+        .section-title .icon {
+            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #1a1f2e;
+        }
+        .section-title h2 {
+            font-size: 20px;
+            color: #fff;
+            font-weight: 600;
+        }
+        .section-title .badge {
+            margin-left: auto;
+            padding: 3px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-ok { background: rgba(39,174,96,0.2); color: #27ae60; border: 1px solid rgba(39,174,96,0.3); }
+        .badge-warn { background: rgba(243,156,18,0.2); color: #f39c12; border: 1px solid rgba(243,156,18,0.3); }
+        .badge-missing { background: rgba(231,76,60,0.2); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+
+        /* ── Intro card ── */
+        .intro-card {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-left: 4px solid #e74c8b;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 40px;
+        }
+        .intro-card p { color: #b0bec5; font-size: 15px; margin-bottom: 10px; }
+        .intro-card p:last-child { margin-bottom: 0; }
+        .intro-card strong { color: #e0e0e0; }
+
+        /* ── Flujo de datos ── */
+        .flow {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            padding: 8px 0 16px;
+            margin-bottom: 24px;
+        }
+        .flow-node {
+            flex-shrink: 0;
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+            min-width: 130px;
+        }
+        .flow-node .n-icon { font-size: 24px; margin-bottom: 6px; }
+        .flow-node .n-title { font-size: 12px; font-weight: 600; color: #fff; }
+        .flow-node .n-sub { font-size: 11px; color: #667; margin-top: 3px; }
+        .flow-node.active { border-color: #27ae60; background: rgba(39,174,96,0.08); }
+        .flow-node.partial { border-color: #f39c12; background: rgba(243,156,18,0.08); }
+        .flow-node.missing { border-color: #e74c3c; background: rgba(231,76,60,0.08); }
+        .flow-arrow {
+            flex-shrink: 0;
+            color: #3a4560;
+            font-size: 22px;
+            padding: 0 4px;
+        }
+
+        /* ── Grid de tablas ── */
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+        .table-card {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+        .table-card.ok { border-left: 3px solid #27ae60; }
+        .table-card.partial { border-left: 3px solid #f39c12; }
+        .table-card.empty { border-left: 3px solid #e74c3c; }
+        .table-card .tc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .table-card .tc-name {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: #7eb8f7;
+        }
+        .table-card .tc-rows {
+            font-size: 12px;
+            font-weight: 600;
+            color: #27ae60;
+        }
+        .table-card .tc-rows.empty { color: #e74c3c; }
+        .table-card .tc-rows.partial { color: #f39c12; }
+        .table-card .tc-desc {
+            font-size: 13px;
+            color: #8899aa;
+            line-height: 1.4;
+        }
+        .table-card .tc-source {
+            margin-top: 10px;
+            font-size: 11px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tc-source .src-badge {
+            background: #252d40;
+            padding: 2px 8px;
+            border-radius: 8px;
+            color: #667;
+        }
+
+        /* ── Vistas analíticas ── */
+        .views-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .view-row {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .view-row .vr-name {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #7eb8f7;
+            min-width: 220px;
+        }
+        .view-row .vr-desc {
+            font-size: 13px;
+            color: #8899aa;
+            flex: 1;
+        }
+        .view-row .vr-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+        .st-live { background: rgba(39,174,96,0.2); color: #27ae60; }
+        .st-partial { background: rgba(243,156,18,0.2); color: #f39c12; }
+        .st-empty { background: rgba(231,76,60,0.2); color: #e74c3c; }
+
+        /* ── AppSheet ── */
+        .appsheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .app-card {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .app-card .ac-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .app-card .ac-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .app-card .ac-name { font-size: 14px; font-weight: 600; color: #fff; }
+        .app-card .ac-user { font-size: 12px; color: #667; }
+        .app-card .ac-desc { font-size: 13px; color: #8899aa; margin-bottom: 12px; }
+        .app-card .ac-writes {
+            background: #252d40;
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+        .app-card .ac-writes .aw-label {
+            font-size: 11px;
+            color: #667;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .app-card .ac-writes .aw-table {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #7eb8f7;
+        }
+        .app-card .ac-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        .dot-green { width: 8px; height: 8px; border-radius: 50%; background: #27ae60; flex-shrink: 0; }
+        .dot-yellow { width: 8px; height: 8px; border-radius: 50%; background: #f39c12; flex-shrink: 0; }
+        .dot-red { width: 8px; height: 8px; border-radius: 50%; background: #e74c3c; flex-shrink: 0; }
+
+        /* ── Cómo conectar ── */
+        .connect-steps {
+            counter-reset: steps;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .step {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            gap: 20px;
+        }
+        .step-num {
+            counter-increment: steps;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c8b, #8e44ad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .step-body { flex: 1; }
+        .step-body h4 { font-size: 14px; color: #fff; margin-bottom: 6px; }
+        .step-body p { font-size: 13px; color: #8899aa; }
+        .step-body code {
+            display: inline-block;
+            background: #252d40;
+            color: #7eb8f7;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+
+        /* ── Faltantes ── */
+        .missing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .missing-card {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+        .missing-card .mc-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .mc-prio {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .prio-high { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        .prio-med  { background: rgba(243,156,18,0.2); color: #f39c12; }
+        .prio-low  { background: rgba(52,152,219,0.2); color: #3498db; }
+        .missing-card h4 { font-size: 14px; color: #fff; }
+        .missing-card p { font-size: 13px; color: #8899aa; margin-top: 6px; }
+        .missing-card .mc-impact {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #4a5568;
+            border-top: 1px solid #252d40;
+            padding-top: 8px;
+        }
+        .missing-card .mc-impact span { color: #667; }
+
+        /* ── Resumen final ── */
+        .summary-bar {
+            background: #1a1f2e;
+            border: 1px solid #252d40;
+            border-radius: 16px;
+            padding: 28px 32px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 24px;
+            text-align: center;
+        }
+        .sum-item .sum-val {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .sum-item .sum-val.green { color: #27ae60; }
+        .sum-item .sum-val.yellow { color: #f39c12; }
+        .sum-item .sum-val.red { color: #e74c3c; }
+        .sum-item .sum-label {
+            font-size: 12px;
+            color: #667;
+            margin-top: 4px;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            padding: 32px;
+            border-top: 1px solid #1a1f2e;
+            color: #3a4560;
+            font-size: 13px;
+        }
+
+        /* ── Misc ── */
+        .divider { height: 1px; background: #1a1f2e; margin: 40px 0; }
+        ul.check-list { list-style: none; padding: 0; }
+        ul.check-list li {
+            padding: 5px 0;
+            font-size: 13px;
+            color: #8899aa;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        ul.check-list li::before { content: '→'; color: #3a4560; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="logo">🌸</div>
+    <h1>Sky Flowers — BigQuery: Estado del Sistema</h1>
+    <p>Cómo funciona la base de datos analítica, qué información ya tenemos y qué falta para que quede completa.</p>
+    <span class="fecha">Marzo 2026</span>
+</div>
+
+<div class="container">
+
+    <!-- INTRO -->
+    <div class="intro-card">
+        <p><strong>¿Qué es BigQuery y para qué lo usamos?</strong> BigQuery es la base de datos analítica de Sky Flowers en la nube de Google. A diferencia de los sistemas del día a día (AppSheets, World Office, SQL Server), BigQuery no es para registrar lo que pasa — es para <strong>analizar lo que ya pasó y proyectar lo que va a pasar</strong>.</p>
+        <p>Piénsalo así: los AppSheets son la <strong>caja registradora</strong> de cada finca. BigQuery es el <strong>contador que revisa todas las cajas al final del día</strong>, las compara, y te dice dónde ganar más dinero.</p>
+        <p><strong>Lo que ya responde hoy:</strong> ¿Cuántas personas necesito la próxima semana en SKY3? ¿Qué camas están activas en SKY1? ¿Cuántos tallos se cortaron en febrero? ¿Qué labores quedaron mal ejecutadas?</p>
+    </div>
+
+    <!-- FLUJO DE DATOS -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">🔄</div>
+            <h2>Cómo fluye la información</h2>
+        </div>
+
+        <div class="flow">
+            <div class="flow-node partial">
+                <div class="n-icon">📱</div>
+                <div class="n-title">AppSheets</div>
+                <div class="n-sub">Siembras, Labores, Monitoreo, Recepción</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node partial">
+                <div class="n-icon">🔌</div>
+                <div class="n-title">Conector API</div>
+                <div class="n-sub">Script Python (falta activar)</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node active">
+                <div class="n-icon">☁️</div>
+                <div class="n-title">BigQuery</div>
+                <div class="n-sub">Modelo estrella v2</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node active">
+                <div class="n-icon">📊</div>
+                <div class="n-title">Vistas analíticas</div>
+                <div class="n-sub">11 vistas listas</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node active">
+                <div class="n-icon">🖥️</div>
+                <div class="n-title">Dashboard + WhatsApp</div>
+                <div class="n-sub">Tiempo real</div>
+            </div>
+        </div>
+
+        <p style="font-size:13px; color:#667; text-align:center;">
+            🟡 El eslabón pendiente: conectar los AppSheets para que BigQuery se actualice automáticamente cada día.
+        </p>
+    </div>
+
+    <!-- DIMENSIONES -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">📐</div>
+            <h2>Dimensiones — "El catálogo de lo que existe"</h2>
+            <span class="badge badge-ok">7 tablas activas</span>
+        </div>
+        <p style="font-size:13px; color:#8899aa; margin-bottom:20px;">
+            Las dimensiones son las tablas que describen el mundo de Sky Flowers: las fincas, las camas, las variedades, los empleados. <strong>No cambian con frecuencia</strong> — son el mapa del terreno.
+        </p>
+        <div class="tables-grid">
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_sedes</span>
+                    <span class="tc-rows">7 filas</span>
+                </div>
+                <div class="tc-desc">Las 7 fincas: SKY1 a SKY7. Municipio, altitud, área.</div>
+                <div class="tc-source"><span class="src-badge">📌 Manual</span> Falta: hectáreas exactas y coordenadas GPS de cada finca</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_bloques</span>
+                    <span class="tc-rows">132 filas</span>
+                </div>
+                <div class="tc-desc">Los bloques dentro de cada finca (B01, B02…). Agrupan las camas.</div>
+                <div class="tc-source"><span class="src-badge">📌 Excel migrado</span></div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_camas</span>
+                    <span class="tc-rows">10,444 filas</span>
+                </div>
+                <div class="tc-desc">La unidad más pequeña. Cada cama tiene largo, área, capacidad y tipo de cultivo.</div>
+                <div class="tc-source"><span class="src-badge">📌 Excel migrado</span> Falta: sincronizar cuando crean camas nuevas</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_variedades</span>
+                    <span class="tc-rows">38 filas</span>
+                </div>
+                <div class="tc-desc">Variedades de flor: tipo (Hydrangea, Lepidium…), color.</div>
+                <div class="tc-source"><span class="src-badge">📌 Excel migrado</span></div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_empleados</span>
+                    <span class="tc-rows">282 filas</span>
+                </div>
+                <div class="tc-desc">Todos los trabajadores con área y sede.</div>
+                <div class="tc-source"><span class="src-badge">📌 Excel migrado</span> Falta: conectar a GH para ingresos/retiros automáticos</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_labores</span>
+                    <span class="tc-rows">131 filas</span>
+                </div>
+                <div class="tc-desc">Catálogo de 131 labores de campo y poscosecha.</div>
+                <div class="tc-source"><span class="src-badge">📌 Excel migrado</span></div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_estandares_labor</span>
+                    <span class="tc-rows">109 filas</span>
+                </div>
+                <div class="tc-desc">Cuántas personas/horas requiere cada labor por m². Base del Software Renzo.</div>
+                <div class="tc-source"><span class="src-badge">📌 Excel calibrado</span> Pendiente: calibrar riego, fertilización, desmalezar</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">dim_programa_labores</span>
+                    <span class="tc-rows">109 filas</span>
+                </div>
+                <div class="tc-desc">Calendario de cuándo se hace cada labor según semana del ciclo del cultivo.</div>
+                <div class="tc-source"><span class="src-badge">📌 Sistema RENZO migrado</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HECHOS -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">📋</div>
+            <h2>Hechos — "Lo que realmente pasó"</h2>
+            <span class="badge badge-warn">1 tabla vacía</span>
+        </div>
+        <p style="font-size:13px; color:#8899aa; margin-bottom:20px;">
+            Las tablas de hechos registran los eventos: siembras, cosechas, labores ejecutadas. <strong>Crecen todos los días</strong> — son la historia viva de las fincas. Hoy tienen datos históricos cargados desde los Excel viejos; el reto es que se actualicen solos con los AppSheets.
+        </p>
+        <div class="tables-grid">
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">fact_siembras</span>
+                    <span class="tc-rows">28,257 filas</span>
+                </div>
+                <div class="tc-desc">Cada vez que se siembra o poda una cama. Fecha, variedad, cantidad de plantas.</div>
+                <div class="tc-source"><span class="src-badge">📱 App Siembras</span> Falta: conectar para actualización diaria</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">fact_recepcion</span>
+                    <span class="tc-rows">41,980 filas</span>
+                </div>
+                <div class="tc-desc">Cada entrada de tallos a poscosecha. La fuente de producción real.</div>
+                <div class="tc-source"><span class="src-badge">📱 App Recepción</span> Falta: conectar para actualización diaria</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">fact_monitoreo</span>
+                    <span class="tc-rows">11,488 filas</span>
+                </div>
+                <div class="tc-desc">Recorridas fitosanitarias de las monitoras. Estado de plagas y enfermedades por cama.</div>
+                <div class="tc-source"><span class="src-badge">📱 App Monitoreo</span> Falta: conectar para actualización diaria</div>
+            </div>
+            <div class="table-card ok">
+                <div class="tc-header">
+                    <span class="tc-name">fact_labores</span>
+                    <span class="tc-rows">42,329 filas</span>
+                </div>
+                <div class="tc-desc">Turnos trabajados por persona por labor. Fuente del rendimiento real.</div>
+                <div class="tc-source"><span class="src-badge">📱 App Labores</span> Falta: conectar para actualización diaria</div>
+            </div>
+            <div class="table-card empty">
+                <div class="tc-header">
+                    <span class="tc-name">fact_conteo</span>
+                    <span class="tc-rows empty">0 filas</span>
+                </div>
+                <div class="tc-desc">Conteo de plantas después de poda. Necesario para proyectar producción futura.</div>
+                <div class="tc-source"><span class="src-badge">🖥️ SQL Server</span> Falta: exportar tabla desde Juan Fernando</div>
+            </div>
+            <div class="table-card partial">
+                <div class="tc-header">
+                    <span class="tc-name">fact_plan_labores</span>
+                    <span class="tc-rows partial">Vacía (nueva)</span>
+                </div>
+                <div class="tc-desc">El plan aprobado de mano de obra por semana. Se llenará desde un formulario.</div>
+                <div class="tc-source"><span class="src-badge">📝 Pendiente crear</span> Necesita un formulario AppSheet o entrada manual</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTAS ANALÍTICAS -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">📈</div>
+            <h2>Vistas analíticas — "Las preguntas que ya responde"</h2>
+            <span class="badge badge-ok">11 vistas activas</span>
+        </div>
+        <p style="font-size:13px; color:#8899aa; margin-bottom:20px;">
+            Las vistas son consultas pre-armadas que combinan las tablas para responder preguntas específicas. No hay que programar nada nuevo — solo conectar el front-end.
+        </p>
+        <div class="views-list">
+            <div class="view-row">
+                <span class="vr-name">vw_demanda_semanal</span>
+                <span class="vr-desc">¿Cuántas personas necesito la próxima semana, en qué sede y para qué labor? → Base del Software Renzo y los mensajes a supervisores</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_produccion_semanal</span>
+                <span class="vr-desc">Tallos cortados por semana ISO, sede y variedad</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_ocupacion_finca</span>
+                <span class="vr-desc">% de camas activas por tipo de cultivo y sede</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_plantas_activas</span>
+                <span class="vr-desc">Última siembra/conteo por cama + % de capacidad utilizada</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_estado_fitosanitario</span>
+                <span class="vr-desc">Último monitoreo por cama, alertas de plagas activas</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_rendimiento_labores</span>
+                <span class="vr-desc">Rendimiento real vs. estándar por labor, empleado y sede</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_proyeccion_corte</span>
+                <span class="vr-desc">Probabilidad gaussiana de corte por cama en las próximas semanas</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_potencial_conversion</span>
+                <span class="vr-desc">Camas de Lepidium/Matricaria que podrían convertirse a Hortensia</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_dashboard_produccion</span>
+                <span class="vr-desc">Vista ejecutiva mensual: producción, rendimiento y ocupación por sede</span>
+                <span class="vr-status st-live">✅ En vivo</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_sofa_renzo</span>
+                <span class="vr-desc">Plan vs. Real de mano de obra. Requiere fact_plan_labores llena para funcionar.</span>
+                <span class="vr-status st-partial">🟡 Parcial</span>
+            </div>
+            <div class="view-row">
+                <span class="vr-name">vw_carga_semanal_resumen</span>
+                <span class="vr-desc">Resumen ejecutivo: personas-hora plan vs real por sede. Idem — requiere plan cargado.</span>
+                <span class="vr-status st-partial">🟡 Parcial</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- APPSHEETS -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">📱</div>
+            <h2>AppSheets — Los que hay que conectar</h2>
+            <span class="badge badge-warn">Conexión pendiente</span>
+        </div>
+        <p style="font-size:13px; color:#8899aa; margin-bottom:20px;">
+            Hoy los AppSheets escriben en Google Sheets. El plan es que cada vez que alguien registra algo en un AppSheet, esa información llegue automáticamente a BigQuery también. No hay que cambiar cómo trabaja la gente — solo agregar un destino más.
+        </p>
+        <div class="appsheet-grid">
+            <div class="app-card">
+                <div class="ac-header">
+                    <div class="ac-icon" style="background:rgba(52,152,219,0.15);">🌱</div>
+                    <div>
+                        <div class="ac-name">App Siembras / Podas</div>
+                        <div class="ac-user">Líderes de campo</div>
+                    </div>
+                </div>
+                <div class="ac-desc">Registra cuándo se siembra o poda cada cama. Es la base del ciclo de cultivo y de la proyección de cosecha.</div>
+                <div class="ac-writes">
+                    <div class="aw-label">Escribe en BigQuery →</div>
+                    <div class="aw-table">fact_siembras</div>
+                </div>
+                <div class="ac-status">
+                    <div class="dot-yellow"></div>
+                    <span style="font-size:12px;color:#8899aa;">Datos históricos cargados · Falta sincronización en vivo</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="ac-header">
+                    <div class="ac-icon" style="background:rgba(231,76,139,0.15);">✂️</div>
+                    <div>
+                        <div class="ac-name">App Recepción Poscosecha</div>
+                        <div class="ac-user">Christian / Poscosecha</div>
+                    </div>
+                </div>
+                <div class="ac-desc">Registra cada entrada de tallos a poscosecha. Es la fuente de producción real — cuánto cortó cada cama cada semana.</div>
+                <div class="ac-writes">
+                    <div class="aw-label">Escribe en BigQuery →</div>
+                    <div class="aw-table">fact_recepcion</div>
+                </div>
+                <div class="ac-status">
+                    <div class="dot-yellow"></div>
+                    <span style="font-size:12px;color:#8899aa;">Datos históricos cargados · Falta sincronización en vivo</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="ac-header">
+                    <div class="ac-icon" style="background:rgba(39,174,96,0.15);">🔍</div>
+                    <div>
+                        <div class="ac-name">App Monitoreo</div>
+                        <div class="ac-user">6 monitoras de campo</div>
+                    </div>
+                </div>
+                <div class="ac-desc">Recorrida fitosanitaria. Registra el estado de plagas y enfermedades cama por cama.</div>
+                <div class="ac-writes">
+                    <div class="aw-label">Escribe en BigQuery →</div>
+                    <div class="aw-table">fact_monitoreo</div>
+                </div>
+                <div class="ac-status">
+                    <div class="dot-yellow"></div>
+                    <span style="font-size:12px;color:#8899aa;">Datos históricos cargados · Falta sincronización en vivo</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="ac-header">
+                    <div class="ac-icon" style="background:rgba(155,89,182,0.15);">👷</div>
+                    <div>
+                        <div class="ac-name">App Turnos / Labores</div>
+                        <div class="ac-user">Líderes de campo</div>
+                    </div>
+                </div>
+                <div class="ac-desc">Registra qué hizo cada persona cada día: labor, cama, horas. Es la fuente del rendimiento real vs. el estándar.</div>
+                <div class="ac-writes">
+                    <div class="aw-label">Escribe en BigQuery →</div>
+                    <div class="aw-table">fact_labores</div>
+                </div>
+                <div class="ac-status">
+                    <div class="dot-yellow"></div>
+                    <span style="font-size:12px;color:#8899aa;">Datos históricos cargados · Falta sincronización en vivo</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="ac-header">
+                    <div class="ac-icon" style="background:rgba(243,156,18,0.15);">📦</div>
+                    <div>
+                        <div class="ac-name">App Almacén</div>
+                        <div class="ac-user">Steven</div>
+                    </div>
+                </div>
+                <div class="ac-desc">Salidas de insumos con centros de costo. Necesario para el P&L por sede y labor.</div>
+                <div class="ac-writes">
+                    <div class="aw-label">Escribe en BigQuery →</div>
+                    <div class="aw-table">fact_insumos (pendiente crear)</div>
+                </div>
+                <div class="ac-status">
+                    <div class="dot-red"></div>
+                    <span style="font-size:12px;color:#8899aa;">No conectado — necesita tabla nueva en BigQuery</span>
+                </div>
+            </div>
+
+            <div class="app-card">
+                <div class="ac-header">
+                    <div class="ac-icon" style="background:rgba(52,152,219,0.15);">📝</div>
+                    <div>
+                        <div class="ac-name">Formulario Plan Semanal</div>
+                        <div class="ac-user">Valentina / Supervisores</div>
+                    </div>
+                </div>
+                <div class="ac-desc">Todavía no existe. Permitiría a los supervisores aprobar o ajustar el plan proyectado cada semana.</div>
+                <div class="ac-writes">
+                    <div class="aw-label">Escribe en BigQuery →</div>
+                    <div class="aw-table">fact_plan_labores (lista, vacía)</div>
+                </div>
+                <div class="ac-status">
+                    <div class="dot-red"></div>
+                    <span style="font-size:12px;color:#8899aa;">Pendiente crear — habilita Plan vs Real</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CÓMO CONECTAR -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">🔌</div>
+            <h2>Cómo se conectan los AppSheets a BigQuery</h2>
+        </div>
+        <p style="font-size:13px; color:#8899aa; margin-bottom:24px;">
+            Hay tres formas de hacerlo. La más simple es la opción 1 — no requiere tocar los AppSheets ni cambiar cómo trabaja nadie.
+        </p>
+        <div class="connect-steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                    <h4>Sincronización nocturna (recomendada) — Script Python automático</h4>
+                    <p>Un script corre todos los días a las 11pm, lee el Google Sheet de cada AppSheet vía API de Google Sheets, y sube las filas nuevas a BigQuery. No toca los AppSheets, no cambia nada para los usuarios. El dashboard se actualiza con datos del día anterior.</p>
+                    <code>python sync_appsheets_bigquery.py --fecha hoy</code>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                    <h4>Tiempo real vía webhook — AppSheet llama a BigQuery al guardar</h4>
+                    <p>Se configura en AppSheet un "Bot" que dispara un webhook cada vez que alguien guarda un registro. El webhook llega al bot Flask que lo sube a BigQuery. Más complejo de configurar pero actualización inmediata.</p>
+                    <code>AppSheet Bot → POST /webhook/siembras → BigQuery</code>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                    <h4>BigQuery Data Transfer desde Google Sheets</h4>
+                    <p>Google tiene un conector nativo que lee un Google Sheet y lo copia a BigQuery automáticamente cada hora. La más fácil de activar si el Sheet está bien estructurado, pero menos flexible.</p>
+                    <code>BigQuery Console → Data Transfers → Google Sheets</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- LO QUE FALTA -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">🎯</div>
+            <h2>Lo que falta para que quede completo</h2>
+        </div>
+        <div class="missing-grid">
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-high">Alta prioridad</span>
+                </div>
+                <h4>🔄 Conectar AppSheets a BigQuery</h4>
+                <p>Hoy los datos son históricos. Sin la conexión, BigQuery se va quedando viejo. La sincronización nocturna es la opción más rápida de implementar.</p>
+                <div class="mc-impact"><span>Impacto:</span> Sin esto, todas las vistas analíticas muestran datos de hace semanas.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-high">Alta prioridad</span>
+                </div>
+                <h4>📊 fact_conteo — Conteo post-poda</h4>
+                <p>Juan Fernando tiene esta tabla en SQL Server. Exportarla desbloquea la proyección de cosecha a 3+ meses con confianza alta.</p>
+                <div class="mc-impact"><span>Impacto:</span> La proyección gaussiana de corte hoy tiene baja confianza en muchas camas por falta de este dato.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-high">Alta prioridad</span>
+                </div>
+                <h4>👷 Calibrar estándares de labor</h4>
+                <p>Riego, Fertilización, Desmalezar, Subida de mallas y Deshijar aparecen en el plan con "— personas" porque no tienen rendimiento definido.</p>
+                <div class="mc-impact"><span>Impacto:</span> El plan a supervisores muestra labores sin cantidad de personas.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-med">Media prioridad</span>
+                </div>
+                <h4>📝 Formulario fact_plan_labores</h4>
+                <p>Un AppSheet simple donde el supervisor aprueba o ajusta el plan proyectado. Una vez que haya plan cargado, se activa la comparación Plan vs Real.</p>
+                <div class="mc-impact"><span>Impacto:</span> Activa vw_sofa_renzo y el semáforo de cumplimiento por supervisor.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-med">Media prioridad</span>
+                </div>
+                <h4>📦 App Almacén de Steven</h4>
+                <p>Conectar las salidas de insumos con centros de costo a BigQuery. Habilita el costo por labor y el P&L por sede.</p>
+                <div class="mc-impact"><span>Impacto:</span> Sin esto no se puede calcular el costo real por tallo cortado.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-med">Media prioridad</span>
+                </div>
+                <h4>🗺️ Datos faltantes en dim_sedes</h4>
+                <p>Las 7 fincas no tienen hectáreas totales ni coordenadas GPS. Necesario para calcular densidades y visualizar en mapa.</p>
+                <div class="mc-impact"><span>Impacto:</span> Algunas métricas de densidad y rendimiento por ha son imprecisas.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-low">Futuro</span>
+                </div>
+                <h4>⏰ Envío automático los domingos</h4>
+                <p>Task Scheduler en el servidor que ejecute el envío de planes a supervisores todos los domingos a las 6pm automáticamente.</p>
+                <div class="mc-impact"><span>Impacto:</span> Hoy hay que correr el script manualmente.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-low">Futuro</span>
+                </div>
+                <h4>🏪 dim_proveedores</h4>
+                <p>La base de los ~40 proveedores de Ramiro digitalizada. Necesaria para el módulo de compras y costos de insumos.</p>
+                <div class="mc-impact"><span>Impacto:</span> Sin esto el módulo de compras es manual.</div>
+            </div>
+
+            <div class="missing-card">
+                <div class="mc-header">
+                    <span class="mc-prio prio-low">Futuro</span>
+                </div>
+                <h4>👔 Conectar GH (Gestión Humana)</h4>
+                <p>Cuando Luisa registra un ingreso o retiro, que dim_empleados se actualice sola. Hoy hay que actualizarla manualmente.</p>
+                <div class="mc-impact"><span>Impacto:</span> dim_empleados puede tener personas retiradas o faltar nuevos.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESUMEN FINAL -->
+    <div class="section">
+        <div class="section-title">
+            <div class="icon">📌</div>
+            <h2>Resumen del estado actual</h2>
+        </div>
+        <div class="summary-bar">
+            <div class="sum-item">
+                <div class="sum-val green">124k+</div>
+                <div class="sum-label">Registros históricos cargados</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val green">11</div>
+                <div class="sum-label">Vistas analíticas activas</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val green">8</div>
+                <div class="sum-label">Supervisores con plan WhatsApp</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val yellow">4</div>
+                <div class="sum-label">AppSheets por conectar</div>
+            </div>
+            <div class="sum-item">
+                <div class="sum-val red">1</div>
+                <div class="sum-label">Tabla vacía (fact_conteo)</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    Sky Flowers · BigQuery Modelo Estrella v2 · Proyecto: skyflowers-platform-production.produccion<br>
+    Documentación generada: marzo 2026 · Por: Emiliano Bojanini
+</div>
+
+</body>
+</html>

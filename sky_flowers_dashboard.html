@@ -2013,8 +2013,8 @@
 
         <!-- Software Renzo Section Header -->
         <div class="renzo-section-header">
-            <h2><span>👷</span> Software Renzo — Planeación de Mano de Obra</h2>
-            <p>Plan semanal vs. real por sede y labor | <span id="renzoDataStatus">Cargando...</span></p>
+            <h2><span>👷</span> Software Renzo — Proyección de Mano de Obra</h2>
+            <p>Demanda proyectada por sede y labor (calendario × camas activas) | <span id="renzoDataStatus">Cargando...</span></p>
         </div>
 
         <!-- Card R1: Resumen por sede -->
@@ -2038,14 +2038,13 @@
                         <tr>
                             <th>Sede</th>
                             <th class="num">Labores</th>
-                            <th class="num">Plan</th>
-                            <th class="num">Real</th>
-                            <th class="num">% Ejec.</th>
-                            <th>Estado</th>
+                            <th class="num">Pers. Req.</th>
+                            <th class="num">Horas</th>
+                            <th>Confianza</th>
                         </tr>
                     </thead>
                     <tbody id="renzoResumenBody">
-                        <tr><td colspan="6" class="renzo-no-data">Cargando...</td></tr>
+                        <tr><td colspan="5" class="renzo-no-data">Cargando...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -2079,10 +2078,10 @@
                         <tr>
                             <th>Labor</th>
                             <th>Tipo</th>
-                            <th class="num">Plan</th>
-                            <th class="num">Real</th>
-                            <th class="num">H.Plan</th>
-                            <th>Estado</th>
+                            <th class="num">Camas</th>
+                            <th class="num">Pers. Req.</th>
+                            <th class="num">Horas</th>
+                            <th>Confianza</th>
                         </tr>
                     </thead>
                     <tbody id="renzoDetalleBody">
@@ -3067,44 +3066,84 @@
             }
         }
         // ================================================================
-        // SOFÁ RENZO — Plan vs Real de Mano de Obra
+        // SOFTWARE RENZO — Proyección de Mano de Obra
         // ================================================================
 
         const RENZO_API_BASE = 'http://localhost:5000/api/software-renzo';
-        // Semanas con plan (202610–202617) + últimas semanas ejecutadas
-        const RENZO_SEMANAS = ['202608','202609','202610','202611','202612','202613','202614','202615','202616','202617'];
-        let renzoSemanaActual = '202610';
+        let renzoSemanaActual = '';
         let renzoSedeActual = '';
 
-        function semPillHtml(semaforo) {
-            const cls = { VERDE: 'sem-verde', AMARILLO: 'sem-amarillo', ROJO: 'sem-rojo', GRIS: 'sem-gris' };
-            return `<span class="sem-pill ${cls[semaforo] || 'sem-gris'}">${semaforo || 'GRIS'}</span>`;
+        // ── Helpers ISO week ────────────────────────────────────────────
+        function getISOWeekCode(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dow = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dow);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+            return `${d.getUTCFullYear()}${String(weekNo).padStart(2, '0')}`;
         }
 
+        function getNextISOWeek() {
+            const d = new Date();
+            d.setDate(d.getDate() + 7);
+            return getISOWeekCode(d);
+        }
+
+        function generateRenzoSemanas() {
+            const weeks = [];
+            const today = new Date();
+            for (let i = -2; i <= 8; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + i * 7);
+                weeks.push(getISOWeekCode(d));
+            }
+            return [...new Set(weeks)];
+        }
+
+        function isoWeekLabel(code) {
+            const year = parseInt(code.slice(0, 4));
+            const week = parseInt(code.slice(4));
+            const jan4 = new Date(year, 0, 4);
+            const mon = new Date(jan4);
+            mon.setDate(jan4.getDate() - (jan4.getDay() || 7) + 1 + (week - 1) * 7);
+            const fri = new Date(mon);
+            fri.setDate(mon.getDate() + 4);
+            const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+            return `S${week} · ${mon.getDate()} ${meses[mon.getMonth()]}–${fri.getDate()} ${meses[fri.getMonth()]}`;
+        }
+
+        function confPillHtml(conf) {
+            const cls = { ALTA: 'sem-verde', MEDIA: 'sem-amarillo', BAJA: 'sem-rojo' };
+            const label = conf || 'BAJA';
+            return `<span class="sem-pill ${cls[label] || 'sem-gris'}">${label}</span>`;
+        }
+
+        // ── Init ────────────────────────────────────────────────────────
         function initRenzoSemanas() {
+            renzoSemanaActual = getNextISOWeek();
+            const semanas = generateRenzoSemanas();
             const sel = document.getElementById('renzoSemanaSelect');
-            sel.innerHTML = RENZO_SEMANAS.map(s => `<option value="${s}"${s===renzoSemanaActual?' selected':''}>${s.slice(0,4)}-S${s.slice(4)}</option>`).join('');
+            sel.innerHTML = semanas.map(s =>
+                `<option value="${s}"${s === renzoSemanaActual ? ' selected' : ''}>${isoWeekLabel(s)}</option>`
+            ).join('');
         }
 
+        // ── Render ──────────────────────────────────────────────────────
         function renderRenzoResumen(rows, timestamp) {
             const tbody = document.getElementById('renzoResumenBody');
             document.getElementById('renzoResumenCount').textContent = rows.length + ' sedes';
             document.getElementById('renzoResumenTimestamp').textContent = 'Actualizado: ' + (timestamp ? timestamp.slice(11,19) : '-');
             if (!rows.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="renzo-no-data">Sin datos para esta semana</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="renzo-no-data">Sin datos para esta semana</td></tr>';
                 return;
             }
-            tbody.innerHTML = rows.map(r => {
-                const pct = r.pct_ejecucion_plan != null ? r.pct_ejecucion_plan.toFixed(0) + '%' : '-';
-                return `<tr>
-                    <td><strong>${r.sede_id}</strong></td>
-                    <td class="num">${r.labores_con_plan ?? '-'}</td>
-                    <td class="num">${r.total_personas_plan ?? '-'}</td>
-                    <td class="num">${r.total_personas_real ?? '-'}</td>
-                    <td class="num">${pct}</td>
-                    <td>${semPillHtml(r.semaforo_global)}</td>
-                </tr>`;
-            }).join('');
+            tbody.innerHTML = rows.map(r => `<tr>
+                <td><strong>${r.sede_id}</strong></td>
+                <td class="num">${r.total_labores ?? '-'}</td>
+                <td class="num">${r.total_personas ?? '-'}</td>
+                <td class="num">${r.total_horas != null ? r.total_horas + 'h' : '-'}</td>
+                <td>${confPillHtml(r.confianza_min)}</td>
+            </tr>`).join('');
         }
 
         function renderRenzoDetalle(rows, timestamp) {
@@ -3115,19 +3154,17 @@
                 tbody.innerHTML = '<tr><td colspan="6" class="renzo-no-data">Sin datos</td></tr>';
                 return;
             }
-            tbody.innerHTML = rows.map(r => {
-                const hplan = r.horas_planificadas != null ? r.horas_planificadas.toFixed(0) + 'h' : '-';
-                return `<tr>
-                    <td>${r.labor_nombre ?? '-'}</td>
-                    <td style="font-size:11px;color:#7f8c8d;">${r.tipo_labor ?? '-'}</td>
-                    <td class="num">${r.personas_planificadas ?? '-'}</td>
-                    <td class="num">${r.personas_reales ?? '-'}</td>
-                    <td class="num">${hplan}</td>
-                    <td>${semPillHtml(r.semaforo)}</td>
-                </tr>`;
-            }).join('');
+            tbody.innerHTML = rows.map(r => `<tr>
+                <td>${r.labor_nombre ?? '-'}</td>
+                <td style="font-size:11px;color:#7f8c8d;">${r.tipo_labor ?? '-'}</td>
+                <td class="num">${r.camas_involucradas ?? '-'}</td>
+                <td class="num">${r.personas_requeridas ?? '-'}</td>
+                <td class="num">${r.horas_requeridas != null ? r.horas_requeridas + 'h' : '-'}</td>
+                <td>${confPillHtml(r.confianza_proyeccion)}</td>
+            </tr>`).join('');
         }
 
+        // ── Fetch ───────────────────────────────────────────────────────
         async function fetchRenzoResumen(semana) {
             try {
                 const resp = await fetch(`${RENZO_API_BASE}/resumen?semana=${semana}`);
@@ -3141,7 +3178,7 @@
                 document.getElementById('renzoDataStatus').textContent = 'Sin conexión · iniciar bot';
                 document.getElementById('renzoDataStatus').style.color = '#e74c3c';
                 document.getElementById('renzoResumenBody').innerHTML =
-                    '<tr><td colspan="6" class="renzo-no-data">Bot offline · ' + err.message + '</td></tr>';
+                    '<tr><td colspan="5" class="renzo-no-data">Bot offline · ' + err.message + '</td></tr>';
             }
         }
 
