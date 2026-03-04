@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sky Flowers — Recorrido de Fincas | 25 feb 2026</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 8mm;
+    max-width: 297mm;
+    max-height: 210mm;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #2e7d32;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .header .logo {
+    height: 45px;
+    width: auto;
+    margin-right: 15px;
+  }
+  .header .title-section {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .header h1 {
+    font-size: 20px;
+    color: #2e7d32;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header .date {
+    font-size: 13px;
+    color: #555;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #4a4a4a;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  /* Route */
+  .route-section { margin-bottom: 14px; }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2e7d32;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .route {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+  .farm-card {
+    background: #e8f5e9;
+    border: 2px solid #2e7d32;
+    border-radius: 8px;
+    padding: 8px 14px;
+    text-align: center;
+    min-width: 130px;
+  }
+  .farm-card.highlight {
+    background: #fff3e0;
+    border-color: #e65100;
+  }
+  .farm-card .farm-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2e7d32;
+  }
+  .farm-card.highlight .farm-name {
+    color: #e65100;
+  }
+  .farm-card .farm-stat {
+    font-size: 10px;
+    color: #333;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .arrow {
+    font-size: 22px;
+    color: #2e7d32;
+    font-weight: 700;
+    padding: 0 8px;
+  }
+
+  /* Columns layout */
+  .columns {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .col-table { flex: 3; }
+  .col-totals { flex: 2; }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  thead th {
+    background: #2e7d32;
+    color: #fff;
+    padding: 5px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4), thead th:nth-child(5) { text-align: right; }
+  tbody td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5) { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:nth-child(even) { background: #f5f5f5; }
+  tbody tr.montaje { background: #fff3e0; }
+  tfoot td {
+    padding: 6px 8px;
+    font-weight: 700;
+    border-top: 2px solid #2e7d32;
+    background: #e8f5e9;
+  }
+  tfoot td:nth-child(2), tfoot td:nth-child(3), tfoot td:nth-child(4), tfoot td:nth-child(5) { text-align: right; }
+  .note { font-size: 9px; color: #e65100; font-weight: 600; }
+
+  /* Totals */
+  .totals-box {
+    background: #f1f8e9;
+    border: 2px solid #2e7d32;
+    border-radius: 8px;
+    padding: 12px 16px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .totals-box h3 {
+    font-size: 12px;
+    color: #2e7d32;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .kpi {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #c8e6c9;
+  }
+  .kpi:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .kpi-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1b5e20;
+    line-height: 1.1;
+  }
+  .kpi-label {
+    font-size: 10px;
+    color: #555;
+    margin-top: 1px;
+  }
+  .growth-box {
+    background: #fff3e0;
+    border: 1px solid #ff9800;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 10px;
+  }
+  .growth-box .kpi-value { color: #e65100; font-size: 18px; }
+  .growth-box .kpi-label { color: #bf360c; }
+
+  /* Potential table */
+  .potential-section {
+    margin-top: 10px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  table.potential {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+  table.potential thead th {
+    background: #e65100;
+    color: #fff;
+    padding: 4px 6px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  table.potential thead th:nth-child(n+2) { text-align: right; }
+  table.potential tbody td {
+    padding: 3px 6px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  table.potential tbody td:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+  table.potential tbody tr:nth-child(even) { background: #fff8f0; }
+  table.potential tfoot td {
+    padding: 4px 6px;
+    font-weight: 700;
+    border-top: 2px solid #e65100;
+    background: #fff3e0;
+  }
+  table.potential tfoot td:nth-child(n+2) { text-align: right; }
+  .potential-note {
+    font-size: 8px;
+    color: #777;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 8px;
+    color: #666;
+    padding: 8px 0;
+    border-top: 1px solid #e0e0e0;
+  }
+  .footer strong {
+    color: #d32f2f;
+    font-weight: 700;
+  }
+  .footer .doc-id {
+    display: block;
+    margin-top: 3px;
+    font-size: 7px;
+    color: #999;
+  }
+
+  /* Watermark */
+  .watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 120px;
+    font-weight: 700;
+    color: rgba(211, 47, 47, 0.08);
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    pointer-events: none;
+    z-index: 9999;
+    user-select: none;
+  }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: #ffebee;
+    border: 2px solid #d32f2f;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    font-size: 8px;
+    color: #b71c1c;
+    line-height: 1.4;
+  }
+  .disclaimer strong {
+    text-transform: uppercase;
+    font-size: 9px;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .disclaimer .recipient {
+    background: #fff;
+    border: 1px solid #d32f2f;
+    padding: 3px 6px;
+    margin: 4px 0;
+    font-weight: 600;
+    color: #d32f2f;
+  }
+</style>
+</head>
+<body>
+
+<!-- Watermark -->
+<div class="watermark">CONFIDENCIAL</div>
+
+<!-- Disclaimer -->
+<div class="disclaimer">
+  <strong>⚠ DOCUMENTO CONFIDENCIAL</strong>
+  Este documento contiene información confidencial y de propiedad exclusiva de Sky Flowers. Su distribución no autorizada constituye violación de acuerdo de confidencialidad y puede resultar en acciones legales.
+  <div class="recipient">Preparado exclusivamente para: SUNSHINE BOUQUETS</div>
+  Documento ID: SF-SUN-20260225-001 | Prohibida su reproducción o distribución sin autorización escrita de Sky Flowers.
+</div>
+
+<div class="header">
+  <img src="Logo SKY.png" alt="Sky Flowers Logo" class="logo">
+  <div class="title-section">
+    <h1>Sky Flowers — Recorrido de Fincas</h1>
+    <span class="date">25 de febrero de 2026</span>
+  </div>
+</div>
+<div class="subtitle">Infraestructura de Produccion de Hortensias</div>
+
+<!-- Route -->
+<div class="route-section">
+  <div class="section-title">Ruta del Recorrido</div>
+  <div class="route">
+    <div class="farm-card">
+      <div class="farm-name">SKY 7</div>
+      <div class="farm-stat">4.2 ha HYD<br>71,322 plantas<br>837 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card">
+      <div class="farm-name">SKY 6</div>
+      <div class="farm-stat">6.4 ha HYD<br>81,886 plantas<br>1,342 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card">
+      <div class="farm-name">SKY 2</div>
+      <div class="farm-stat">2.7 ha HYD + 2.5 ha crec.<br>53,099 plantas<br>635 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card">
+      <div class="farm-name">SKY 1</div>
+      <div class="farm-stat">3.6 ha HYD + 3.8 ha crec.<br>69,306 plantas<br>1,474 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card highlight">
+      <div class="farm-name">SKY 3</div>
+      <div class="farm-stat">6.7 ha HYD + 14.0 ha crec.<br>61,361 plantas<br>988 camas</div>
+    </div>
+  </div>
+</div>
+
+<!-- Columns: Table + Totals -->
+<div class="columns">
+  <div class="col-table">
+    <div class="section-title">Resumen por Finca</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Finca</th>
+          <th>Ha HYD</th>
+          <th>Ha Crec.</th>
+          <th>Camas HYD</th>
+          <th>Plantas Hortensia</th>
+          <th>Variedades</th>
+          <th>Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>SKY 7</strong></td>
+          <td>4.2</td>
+          <td>&mdash;</td>
+          <td>837</td>
+          <td>71,322</td>
+          <td>White</td>
+          <td>100% HYD</td>
+        </tr>
+        <tr>
+          <td><strong>SKY 6</strong></td>
+          <td>6.4</td>
+          <td>&mdash;</td>
+          <td>1,342</td>
+          <td>81,886</td>
+          <td>White (60k), Blue (21k)</td>
+          <td>100% HYD</td>
+        </tr>
+        <tr>
+          <td><strong>SKY 2</strong></td>
+          <td>2.7</td>
+          <td>2.5</td>
+          <td>635</td>
+          <td>53,099</td>
+          <td>White</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>SKY 1</strong></td>
+          <td>3.6</td>
+          <td>3.8</td>
+          <td>1,474</td>
+          <td>69,306</td>
+          <td>White (44k), Blue (20k), +10</td>
+          <td>Mayor diversidad varietal</td>
+        </tr>
+        <tr class="montaje">
+          <td><strong>SKY 3</strong></td>
+          <td>6.7</td>
+          <td>14.0</td>
+          <td>988</td>
+          <td>61,361</td>
+          <td>White</td>
+          <td><span class="note">En montaje</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>TOTAL</td>
+          <td>23.6</td>
+          <td>20.3</td>
+          <td>5,276</td>
+          <td>356,551</td>
+          <td>15 variedades</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="col-totals">
+    <div class="section-title">Totales Actuales</div>
+    <div class="totals-box">
+      <div class="kpi">
+        <div class="kpi-value">23.6 ha</div>
+        <div class="kpi-label">Area actual en Hortensia</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">356,551</div>
+        <div class="kpi-label">Plantas de Hortensia activas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">5,276</div>
+        <div class="kpi-label">Camas dedicadas a HYD</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">20.3 ha</div>
+        <div class="kpi-label">Area disponible para crecimiento</div>
+      </div>
+    </div>
+
+    <div class="potential-section">
+      <div class="section-title">Potencial de Siembra &mdash; Conversion Lepidium/Matricaria a Hortensia</div>
+      <table class="potential">
+        <thead>
+          <tr>
+            <th>Finca</th>
+            <th>Camas</th>
+            <th>m largo</th>
+            <th>m lineales</th>
+            <th>Plantas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>SKY 1</strong></td>
+            <td>701</td>
+            <td>16,020</td>
+            <td>32,039</td>
+            <td>64,078</td>
+          </tr>
+          <tr>
+            <td><strong>SKY 2</strong></td>
+            <td>528</td>
+            <td>11,394</td>
+            <td>22,788</td>
+            <td>45,576</td>
+          </tr>
+          <tr>
+            <td><strong>SKY 3</strong></td>
+            <td>337</td>
+            <td>8,872</td>
+            <td>17,743</td>
+            <td>35,487</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>1,566</td>
+            <td>36,285</td>
+            <td>72,571</td>
+            <td>145,141</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="potential-note">
+        SKY 6 y SKY 7 ya son 100% Hortensia. Calculo: 2 lineas por cama, 1 planta cada 50 cm.
+        <strong>SKY 7:</strong> Conteo completo: 71,322 plantas.
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

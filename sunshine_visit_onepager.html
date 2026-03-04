@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sky Flowers — Recorrido de Fincas | 25 feb 2026</title>
+<style>
+  @page {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: #1a1a1a;
+    background: #fff;
+    padding: 8mm;
+    max-width: 297mm;
+    max-height: 210mm;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #2e7d32;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .header .logo {
+    height: 45px;
+    width: auto;
+    margin-right: 15px;
+  }
+  .header .title-section {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .header h1 {
+    font-size: 20px;
+    color: #2e7d32;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .header .date {
+    font-size: 13px;
+    color: #555;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #4a4a4a;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+
+  /* Route */
+  .route-section { margin-bottom: 14px; }
+  .section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2e7d32;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .route {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+  .farm-card {
+    background: #e8f5e9;
+    border: 2px solid #2e7d32;
+    border-radius: 8px;
+    padding: 8px 14px;
+    text-align: center;
+    min-width: 130px;
+  }
+  .farm-card.highlight {
+    background: #fff3e0;
+    border-color: #e65100;
+  }
+  .farm-card .farm-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2e7d32;
+  }
+  .farm-card.highlight .farm-name {
+    color: #e65100;
+  }
+  .farm-card .farm-stat {
+    font-size: 10px;
+    color: #333;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .arrow {
+    font-size: 22px;
+    color: #2e7d32;
+    font-weight: 700;
+    padding: 0 8px;
+  }
+
+  /* Columns layout */
+  .columns {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .col-table { flex: 3; }
+  .col-totals { flex: 2; }
+
+  /* Table */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  thead th {
+    background: #2e7d32;
+    color: #fff;
+    padding: 5px 8px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  thead th:nth-child(2), thead th:nth-child(3), thead th:nth-child(4), thead th:nth-child(5) { text-align: right; }
+  tbody td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  tbody td:nth-child(2), tbody td:nth-child(3), tbody td:nth-child(4), tbody td:nth-child(5) { text-align: right; font-variant-numeric: tabular-nums; }
+  tbody tr:nth-child(even) { background: #f5f5f5; }
+  tbody tr.montaje { background: #fff3e0; }
+  tfoot td {
+    padding: 6px 8px;
+    font-weight: 700;
+    border-top: 2px solid #2e7d32;
+    background: #e8f5e9;
+  }
+  tfoot td:nth-child(2), tfoot td:nth-child(3), tfoot td:nth-child(4), tfoot td:nth-child(5) { text-align: right; }
+  .note { font-size: 9px; color: #e65100; font-weight: 600; }
+
+  /* Totals */
+  .totals-box {
+    background: #f1f8e9;
+    border: 2px solid #2e7d32;
+    border-radius: 8px;
+    padding: 12px 16px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .totals-box h3 {
+    font-size: 12px;
+    color: #2e7d32;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+  .kpi {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #c8e6c9;
+  }
+  .kpi:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .kpi-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1b5e20;
+    line-height: 1.1;
+  }
+  .kpi-label {
+    font-size: 10px;
+    color: #555;
+    margin-top: 1px;
+  }
+  .growth-box {
+    background: #fff3e0;
+    border: 1px solid #ff9800;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 10px;
+  }
+  .growth-box .kpi-value { color: #e65100; font-size: 18px; }
+  .growth-box .kpi-label { color: #bf360c; }
+
+  /* Potential table */
+  .potential-section {
+    margin-top: 10px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  table.potential {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+  table.potential thead th {
+    background: #e65100;
+    color: #fff;
+    padding: 4px 6px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  table.potential thead th:nth-child(n+2) { text-align: right; }
+  table.potential tbody td {
+    padding: 3px 6px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  table.potential tbody td:nth-child(n+2) { text-align: right; font-variant-numeric: tabular-nums; }
+  table.potential tbody tr:nth-child(even) { background: #fff8f0; }
+  table.potential tfoot td {
+    padding: 4px 6px;
+    font-weight: 700;
+    border-top: 2px solid #e65100;
+    background: #fff3e0;
+  }
+  table.potential tfoot td:nth-child(n+2) { text-align: right; }
+  .potential-note {
+    font-size: 8px;
+    color: #777;
+    margin-top: 4px;
+    line-height: 1.3;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 8px;
+    color: #666;
+    padding: 8px 0;
+    border-top: 1px solid #e0e0e0;
+  }
+  .footer strong {
+    color: #d32f2f;
+    font-weight: 700;
+  }
+  .footer .doc-id {
+    display: block;
+    margin-top: 3px;
+    font-size: 7px;
+    color: #999;
+  }
+
+  /* Watermark */
+  .watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 120px;
+    font-weight: 700;
+    color: rgba(211, 47, 47, 0.08);
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    pointer-events: none;
+    z-index: 9999;
+    user-select: none;
+  }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: #ffebee;
+    border: 2px solid #d32f2f;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    font-size: 8px;
+    color: #b71c1c;
+    line-height: 1.4;
+  }
+  .disclaimer strong {
+    text-transform: uppercase;
+    font-size: 9px;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .disclaimer .recipient {
+    background: #fff;
+    border: 1px solid #d32f2f;
+    padding: 3px 6px;
+    margin: 4px 0;
+    font-weight: 600;
+    color: #d32f2f;
+  }
+</style>
+</head>
+<body>
+
+<!-- Watermark -->
+<div class="watermark">CONFIDENCIAL</div>
+
+<!-- Disclaimer -->
+<div class="disclaimer">
+  <strong>⚠ DOCUMENTO CONFIDENCIAL</strong>
+  Este documento contiene información confidencial y de propiedad exclusiva de Sky Flowers. Su distribución no autorizada constituye violación de acuerdo de confidencialidad y puede resultar en acciones legales.
+  <div class="recipient">Preparado exclusivamente para: SUNSHINE BOUQUETS</div>
+  Documento ID: SF-SUN-20260225-001 | Prohibida su reproducción o distribución sin autorización escrita de Sky Flowers.
+</div>
+
+<div class="header">
+  <img src="Logo SKY.png" alt="Sky Flowers Logo" class="logo">
+  <div class="title-section">
+    <h1>Sky Flowers — Recorrido de Fincas</h1>
+    <span class="date">25 de febrero de 2026</span>
+  </div>
+</div>
+<div class="subtitle">Infraestructura de Produccion de Hortensias</div>
+
+<!-- Route -->
+<div class="route-section">
+  <div class="section-title">Ruta del Recorrido</div>
+  <div class="route">
+    <div class="farm-card">
+      <div class="farm-name">SKY 7</div>
+      <div class="farm-stat">4.2 ha HYD<br>71,322 plantas<br>837 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card">
+      <div class="farm-name">SKY 6</div>
+      <div class="farm-stat">6.4 ha HYD<br>81,886 plantas<br>1,342 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card">
+      <div class="farm-name">SKY 2</div>
+      <div class="farm-stat">2.7 ha HYD + 2.5 ha crec.<br>53,099 plantas<br>635 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card">
+      <div class="farm-name">SKY 1</div>
+      <div class="farm-stat">3.6 ha HYD + 3.8 ha crec.<br>69,306 plantas<br>1,474 camas</div>
+    </div>
+    <div class="arrow">&#x2192;</div>
+    <div class="farm-card highlight">
+      <div class="farm-name">SKY 3</div>
+      <div class="farm-stat">6.7 ha HYD + 14.0 ha crec.<br>61,361 plantas<br>988 camas</div>
+    </div>
+  </div>
+</div>
+
+<!-- Columns: Table + Totals -->
+<div class="columns">
+  <div class="col-table">
+    <div class="section-title">Resumen por Finca</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Finca</th>
+          <th>Ha HYD</th>
+          <th>Ha Crec.</th>
+          <th>Camas HYD</th>
+          <th>Plantas Hortensia</th>
+          <th>Variedades</th>
+          <th>Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>SKY 7</strong></td>
+          <td>4.2</td>
+          <td>&mdash;</td>
+          <td>837</td>
+          <td>71,322</td>
+          <td>White</td>
+          <td>100% HYD</td>
+        </tr>
+        <tr>
+          <td><strong>SKY 6</strong></td>
+          <td>6.4</td>
+          <td>&mdash;</td>
+          <td>1,342</td>
+          <td>81,886</td>
+          <td>White (60k), Blue (21k)</td>
+          <td>100% HYD</td>
+        </tr>
+        <tr>
+          <td><strong>SKY 2</strong></td>
+          <td>2.7</td>
+          <td>2.5</td>
+          <td>635</td>
+          <td>53,099</td>
+          <td>White</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td><strong>SKY 1</strong></td>
+          <td>3.6</td>
+          <td>3.8</td>
+          <td>1,474</td>
+          <td>69,306</td>
+          <td>White (44k), Blue (20k), +10</td>
+          <td>Mayor diversidad varietal</td>
+        </tr>
+        <tr class="montaje">
+          <td><strong>SKY 3</strong></td>
+          <td>6.7</td>
+          <td>14.0</td>
+          <td>988</td>
+          <td>61,361</td>
+          <td>White</td>
+          <td><span class="note">En montaje</span></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>TOTAL</td>
+          <td>23.6</td>
+          <td>20.3</td>
+          <td>5,276</td>
+          <td>356,551</td>
+          <td>15 variedades</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="col-totals">
+    <div class="section-title">Totales Actuales</div>
+    <div class="totals-box">
+      <div class="kpi">
+        <div class="kpi-value">23.6 ha</div>
+        <div class="kpi-label">Area actual en Hortensia</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">356,551</div>
+        <div class="kpi-label">Plantas de Hortensia activas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">5,276</div>
+        <div class="kpi-label">Camas dedicadas a HYD</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value">20.3 ha</div>
+        <div class="kpi-label">Area disponible para crecimiento</div>
+      </div>
+    </div>
+
+    <div class="potential-section">
+      <div class="section-title">Potencial de Siembra &mdash; Conversion Lepidium/Matricaria a Hortensia</div>
+      <table class="potential">
+        <thead>
+          <tr>
+            <th>Finca</th>
+            <th>Camas</th>
+            <th>m largo</th>
+            <th>m lineales</th>
+            <th>Plantas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>SKY 1</strong></td>
+            <td>701</td>
+            <td>16,020</td>
+            <td>32,039</td>
+            <td>64,078</td>
+          </tr>
+          <tr>
+            <td><strong>SKY 2</strong></td>
+            <td>528</td>
+            <td>11,394</td>
+            <td>22,788</td>
+            <td>45,576</td>
+          </tr>
+          <tr>
+            <td><strong>SKY 3</strong></td>
+            <td>337</td>
+            <td>8,872</td>
+            <td>17,743</td>
+            <td>35,487</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>TOTAL</td>
+            <td>1,566</td>
+            <td>36,285</td>
+            <td>72,571</td>
+            <td>145,141</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="potential-note">
+        SKY 6 y SKY 7 ya son 100% Hortensia. Calculo: 2 lineas por cama, 1 planta cada 50 cm.
+        <strong>SKY 7:</strong> Conteo completo: 71,322 plantas.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: Corte Semanal -->
+<div style="page-break-before: always;"></div>
+
+<!-- Watermark Page 2 -->
+<div class="watermark">CONFIDENCIAL</div>
+
+<div class="header" style="margin-top:10px;">
+  <img src="Logo SKY.png" alt="Sky Flowers Logo" class="logo">
+  <div class="title-section">
+    <h1>Sky Flowers — Corte Semanal por Variedad</h1>
+    <span class="date">Feb 2025 – Feb 2026 (12 meses)</span>
+  </div>
+</div>
+<div class="subtitle">Recepcion en Poscosecha — Tallos cortados por finca y variedad</div>
+
+<!-- Chart -->
+<div style="margin-bottom:14px;">
+  <div class="section-title">Corte Semanal Total (todas las fincas)</div>
+  <svg viewBox="0 0 780 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-height:220px;">
+<text x="46" y="13.0" text-anchor="end" font-size="7" fill="#666">59k</text>
+<line x1="50" y1="10.0" x2="770" y2="10.0" stroke="#e0e0e0" stroke-width="0.5"/>
+<text x="46" y="58.0" text-anchor="end" font-size="7" fill="#666">44k</text>
+<line x1="50" y1="55.0" x2="770" y2="55.0" stroke="#e0e0e0" stroke-width="0.5"/>
+<text x="46" y="103.0" text-anchor="end" font-size="7" fill="#666">29k</text>
+<line x1="50" y1="100.0" x2="770" y2="100.0" stroke="#e0e0e0" stroke-width="0.5"/>
+<text x="46" y="148.0" text-anchor="end" font-size="7" fill="#666">14k</text>
+<line x1="50" y1="145.0" x2="770" y2="145.0" stroke="#e0e0e0" stroke-width="0.5"/>
+<text x="46" y="193.0" text-anchor="end" font-size="7" fill="#666">0k</text>
+<line x1="50" y1="190.0" x2="770" y2="190.0" stroke="#e0e0e0" stroke-width="0.5"/>
+<rect x="50.0" y="154.9" width="12.8" height="35.1" fill="#43a047"/>
+<rect x="50.0" y="143.2" width="12.8" height="11.6" fill="#81c784"/>
+<rect x="50.0" y="104.3" width="12.8" height="38.9" fill="#0d47a1"/>
+<rect x="50.0" y="91.9" width="12.8" height="12.4" fill="#1976d2"/>
+<rect x="50.0" y="10.0" width="12.8" height="81.9" fill="#64b5f6"/>
+<text x="56.4" y="207" text-anchor="middle" font-size="6" fill="#666">2025-W09</text>
+<rect x="63.6" y="165.7" width="12.8" height="24.3" fill="#43a047"/>
+<rect x="63.6" y="162.7" width="12.8" height="3.0" fill="#81c784"/>
+<rect x="63.6" y="136.7" width="12.8" height="26.0" fill="#0d47a1"/>
+<rect x="63.6" y="132.8" width="12.8" height="3.9" fill="#1976d2"/>
+<rect x="63.6" y="79.0" width="12.8" height="53.9" fill="#64b5f6"/>
+<rect x="77.2" y="190.0" width="12.8" height="0.0" fill="#1b5e20"/>
+<rect x="77.2" y="152.9" width="12.8" height="37.1" fill="#43a047"/>
+<rect x="77.2" y="152.8" width="12.8" height="0.0" fill="#81c784"/>
+<rect x="77.2" y="135.1" width="12.8" height="17.7" fill="#0d47a1"/>
+<rect x="77.2" y="114.7" width="12.8" height="20.4" fill="#1976d2"/>
+<rect x="77.2" y="92.8" width="12.8" height="21.9" fill="#64b5f6"/>
+<rect x="90.8" y="164.3" width="12.8" height="25.7" fill="#43a047"/>
+<rect x="90.8" y="123.0" width="12.8" height="41.3" fill="#0d47a1"/>
+<rect x="90.8" y="86.3" width="12.8" height="36.8" fill="#1976d2"/>
+<rect x="90.8" y="75.0" width="12.8" height="11.2" fill="#64b5f6"/>
+<rect x="104.4" y="176.0" width="12.8" height="14.0" fill="#43a047"/>
+<rect x="104.4" y="138.1" width="12.8" height="38.0" fill="#0d47a1"/>
+<rect x="104.4" y="121.7" width="12.8" height="16.4" fill="#1976d2"/>
+<rect x="118.0" y="189.8" width="12.8" height="0.2" fill="#1b5e20"/>
+<rect x="118.0" y="177.3" width="12.8" height="12.5" fill="#43a047"/>
+<rect x="118.0" y="143.4" width="12.8" height="33.9" fill="#0d47a1"/>
+<rect x="118.0" y="133.0" width="12.8" height="10.5" fill="#1976d2"/>
+<rect x="118.0" y="132.7" width="12.8" height="0.3" fill="#64b5f6"/>
+<rect x="131.6" y="188.0" width="12.8" height="2.0" fill="#1b5e20"/>
+<rect x="131.6" y="177.7" width="12.8" height="10.3" fill="#43a047"/>
+<rect x="131.6" y="144.8" width="12.8" height="32.9" fill="#0d47a1"/>
+<rect x="131.6" y="139.5" width="12.8" height="5.3" fill="#1976d2"/>
+<rect x="145.2" y="189.2" width="12.8" height="0.8" fill="#1b5e20"/>
+<rect x="145.2" y="175.0" width="12.8" height="14.2" fill="#43a047"/>
+<rect x="145.2" y="148.9" width="12.8" height="26.1" fill="#0d47a1"/>
+<rect x="145.2" y="148.6" width="12.8" height="0.3" fill="#1976d2"/>
+<rect x="158.8" y="184.6" width="12.8" height="5.4" fill="#1b5e20"/>
+<rect x="158.8" y="166.9" width="12.8" height="17.7" fill="#43a047"/>
+<rect x="158.8" y="142.4" width="12.8" height="24.5" fill="#0d47a1"/>
+<rect x="158.8" y="141.9" width="12.8" height="0.5" fill="#1976d2"/>
+<text x="165.20000000000002" y="207" text-anchor="middle" font-size="6" fill="#666">2025-W17</text>
+<rect x="172.39999999999998" y="179.0" width="12.8" height="11.0" fill="#43a047"/>
+<rect x="172.39999999999998" y="151.6" width="12.8" height="27.4" fill="#0d47a1"/>
+<rect x="172.39999999999998" y="151.2" width="12.8" height="0.4" fill="#1976d2"/>
+<rect x="186.0" y="177.9" width="12.8" height="12.1" fill="#43a047"/>
+<rect x="186.0" y="156.0" width="12.8" height="22.0" fill="#0d47a1"/>
+<rect x="186.0" y="155.3" width="12.8" height="0.7" fill="#1976d2"/>
+<rect x="199.6" y="173.5" width="12.8" height="16.5" fill="#43a047"/>
+<rect x="199.6" y="156.8" width="12.8" height="16.7" fill="#0d47a1"/>
+<rect x="199.6" y="150.5" width="12.8" height="6.3" fill="#1976d2"/>
+<rect x="213.2" y="177.1" width="12.8" height="12.9" fill="#43a047"/>
+<rect x="213.2" y="158.7" width="12.8" height="18.3" fill="#0d47a1"/>
+<rect x="213.2" y="132.1" width="12.8" height="26.6" fill="#1976d2"/>
+<rect x="226.79999999999998" y="166.8" width="12.8" height="23.2" fill="#43a047"/>
+<rect x="226.79999999999998" y="135.8" width="12.8" height="31.0" fill="#0d47a1"/>
+<rect x="226.79999999999998" y="87.7" width="12.8" height="48.1" fill="#1976d2"/>
+<rect x="240.4" y="160.7" width="12.8" height="29.3" fill="#43a047"/>
+<rect x="240.4" y="131.2" width="12.8" height="29.5" fill="#0d47a1"/>
+<rect x="240.4" y="75.2" width="12.8" height="56.0" fill="#1976d2"/>
+<rect x="254.0" y="161.3" width="12.8" height="28.7" fill="#43a047"/>
+<rect x="254.0" y="115.0" width="12.8" height="46.3" fill="#0d47a1"/>
+<rect x="254.0" y="77.1" width="12.8" height="37.9" fill="#1976d2"/>
+<rect x="267.6" y="165.3" width="12.8" height="24.7" fill="#43a047"/>
+<rect x="267.6" y="124.3" width="12.8" height="41.0" fill="#0d47a1"/>
+<rect x="267.6" y="94.2" width="12.8" height="30.1" fill="#1976d2"/>
+<rect x="267.6" y="92.5" width="12.8" height="1.7" fill="#64b5f6"/>
+<text x="274.0" y="207" text-anchor="middle" font-size="6" fill="#666">2025-W25</text>
+<rect x="281.2" y="189.9" width="12.8" height="0.1" fill="#1b5e20"/>
+<rect x="281.2" y="167.0" width="12.8" height="23.0" fill="#43a047"/>
+<rect x="281.2" y="126.4" width="12.8" height="40.5" fill="#0d47a1"/>
+<rect x="281.2" y="90.3" width="12.8" height="36.1" fill="#1976d2"/>
+<rect x="281.2" y="89.6" width="12.8" height="0.7" fill="#64b5f6"/>
+<rect x="294.79999999999995" y="170.2" width="12.8" height="19.8" fill="#43a047"/>
+<rect x="294.79999999999995" y="121.9" width="12.8" height="48.4" fill="#0d47a1"/>
+<rect x="294.79999999999995" y="96.9" width="12.8" height="25.0" fill="#1976d2"/>
+<rect x="308.4" y="172.9" width="12.8" height="17.1" fill="#43a047"/>
+<rect x="308.4" y="171.6" width="12.8" height="1.3" fill="#81c784"/>
+<rect x="308.4" y="105.7" width="12.8" height="65.8" fill="#0d47a1"/>
+<rect x="308.4" y="58.2" width="12.8" height="47.5" fill="#1976d2"/>
+<rect x="308.4" y="57.3" width="12.8" height="0.9" fill="#64b5f6"/>
+<rect x="322.0" y="175.7" width="12.8" height="14.3" fill="#43a047"/>
+<rect x="322.0" y="92.0" width="12.8" height="83.7" fill="#0d47a1"/>
+<rect x="322.0" y="66.3" width="12.8" height="25.7" fill="#1976d2"/>
+<rect x="322.0" y="64.4" width="12.8" height="2.0" fill="#64b5f6"/>
+<rect x="335.59999999999997" y="175.8" width="12.8" height="14.2" fill="#43a047"/>
+<rect x="335.59999999999997" y="57.7" width="12.8" height="118.1" fill="#0d47a1"/>
+<rect x="335.59999999999997" y="40.7" width="12.8" height="16.9" fill="#1976d2"/>
+<rect x="335.59999999999997" y="38.3" width="12.8" height="2.5" fill="#64b5f6"/>
+<rect x="349.2" y="181.9" width="12.8" height="8.1" fill="#43a047"/>
+<rect x="349.2" y="82.7" width="12.8" height="99.2" fill="#0d47a1"/>
+<rect x="349.2" y="61.3" width="12.8" height="21.4" fill="#1976d2"/>
+<rect x="362.8" y="179.4" width="12.8" height="10.6" fill="#43a047"/>
+<rect x="362.8" y="63.8" width="12.8" height="115.6" fill="#0d47a1"/>
+<rect x="362.8" y="28.1" width="12.8" height="35.7" fill="#1976d2"/>
+<rect x="362.8" y="27.4" width="12.8" height="0.7" fill="#64b5f6"/>
+<rect x="376.4" y="182.3" width="12.8" height="7.7" fill="#43a047"/>
+<rect x="376.4" y="82.7" width="12.8" height="99.6" fill="#0d47a1"/>
+<rect x="376.4" y="54.1" width="12.8" height="28.6" fill="#1976d2"/>
+<rect x="376.4" y="49.1" width="12.8" height="5.0" fill="#64b5f6"/>
+<text x="382.79999999999995" y="207" text-anchor="middle" font-size="6" fill="#666">2025-W33</text>
+<rect x="390.0" y="184.5" width="12.8" height="5.5" fill="#43a047"/>
+<rect x="390.0" y="112.5" width="12.8" height="72.1" fill="#0d47a1"/>
+<rect x="390.0" y="87.8" width="12.8" height="24.7" fill="#1976d2"/>
+<rect x="390.0" y="82.8" width="12.8" height="5.1" fill="#64b5f6"/>
+<rect x="403.59999999999997" y="183.0" width="12.8" height="7.0" fill="#43a047"/>
+<rect x="403.59999999999997" y="125.1" width="12.8" height="57.9" fill="#0d47a1"/>
+<rect x="403.59999999999997" y="109.4" width="12.8" height="15.7" fill="#1976d2"/>
+<rect x="403.59999999999997" y="101.5" width="12.8" height="7.9" fill="#64b5f6"/>
+<rect x="417.2" y="182.8" width="12.8" height="7.2" fill="#43a047"/>
+<rect x="417.2" y="125.5" width="12.8" height="57.3" fill="#0d47a1"/>
+<rect x="417.2" y="108.9" width="12.8" height="16.6" fill="#1976d2"/>
+<rect x="417.2" y="97.3" width="12.8" height="11.6" fill="#64b5f6"/>
+<rect x="430.8" y="185.6" width="12.8" height="4.4" fill="#43a047"/>
+<rect x="430.8" y="124.1" width="12.8" height="61.5" fill="#0d47a1"/>
+<rect x="430.8" y="98.3" width="12.8" height="25.7" fill="#1976d2"/>
+<rect x="430.8" y="82.5" width="12.8" height="15.8" fill="#64b5f6"/>
+<rect x="444.4" y="184.2" width="12.8" height="5.8" fill="#43a047"/>
+<rect x="444.4" y="145.4" width="12.8" height="38.8" fill="#0d47a1"/>
+<rect x="444.4" y="129.7" width="12.8" height="15.7" fill="#1976d2"/>
+<rect x="444.4" y="113.7" width="12.8" height="16.0" fill="#64b5f6"/>
+<rect x="458.0" y="189.9" width="12.8" height="0.1" fill="#1b5e20"/>
+<rect x="458.0" y="185.0" width="12.8" height="4.9" fill="#43a047"/>
+<rect x="458.0" y="153.7" width="12.8" height="31.4" fill="#0d47a1"/>
+<rect x="458.0" y="141.6" width="12.8" height="12.1" fill="#1976d2"/>
+<rect x="458.0" y="125.8" width="12.8" height="15.7" fill="#64b5f6"/>
+<rect x="471.59999999999997" y="185.9" width="12.8" height="4.1" fill="#43a047"/>
+<rect x="471.59999999999997" y="185.1" width="12.8" height="0.7" fill="#81c784"/>
+<rect x="471.59999999999997" y="156.6" width="12.8" height="28.5" fill="#0d47a1"/>
+<rect x="471.59999999999997" y="153.5" width="12.8" height="3.1" fill="#1976d2"/>
+<rect x="471.59999999999997" y="127.0" width="12.8" height="26.5" fill="#64b5f6"/>
+<rect x="485.2" y="183.3" width="12.8" height="6.7" fill="#43a047"/>
+<rect x="485.2" y="182.3" width="12.8" height="0.9" fill="#81c784"/>
+<rect x="485.2" y="142.2" width="12.8" height="40.1" fill="#0d47a1"/>
+<rect x="485.2" y="131.2" width="12.8" height="11.1" fill="#1976d2"/>
+<rect x="485.2" y="106.5" width="12.8" height="24.7" fill="#64b5f6"/>
+<text x="491.59999999999997" y="207" text-anchor="middle" font-size="6" fill="#666">2025-W41</text>
+<rect x="498.8" y="182.2" width="12.8" height="7.8" fill="#43a047"/>
+<rect x="498.8" y="144.1" width="12.8" height="38.1" fill="#0d47a1"/>
+<rect x="498.8" y="133.8" width="12.8" height="10.4" fill="#1976d2"/>
+<rect x="498.8" y="99.4" width="12.8" height="34.4" fill="#64b5f6"/>
+<rect x="512.4" y="178.0" width="12.8" height="12.0" fill="#43a047"/>
+<rect x="512.4" y="172.5" width="12.8" height="5.5" fill="#81c784"/>
+<rect x="512.4" y="143.2" width="12.8" height="29.2" fill="#0d47a1"/>
+<rect x="512.4" y="127.6" width="12.8" height="15.6" fill="#1976d2"/>
+<rect x="512.4" y="82.7" width="12.8" height="44.9" fill="#64b5f6"/>
+<rect x="526.0" y="181.7" width="12.8" height="8.3" fill="#43a047"/>
+<rect x="526.0" y="175.2" width="12.8" height="6.5" fill="#81c784"/>
+<rect x="526.0" y="131.0" width="12.8" height="44.2" fill="#0d47a1"/>
+<rect x="526.0" y="110.4" width="12.8" height="20.6" fill="#1976d2"/>
+<rect x="526.0" y="63.1" width="12.8" height="47.3" fill="#64b5f6"/>
+<rect x="539.5999999999999" y="176.7" width="12.8" height="13.3" fill="#43a047"/>
+<rect x="539.5999999999999" y="172.4" width="12.8" height="4.3" fill="#81c784"/>
+<rect x="539.5999999999999" y="115.1" width="12.8" height="57.3" fill="#0d47a1"/>
+<rect x="539.5999999999999" y="98.0" width="12.8" height="17.1" fill="#1976d2"/>
+<rect x="539.5999999999999" y="19.5" width="12.8" height="78.6" fill="#64b5f6"/>
+<rect x="553.2" y="188.9" width="12.8" height="1.1" fill="#43a047"/>
+<rect x="553.2" y="174.1" width="12.8" height="14.8" fill="#81c784"/>
+<rect x="553.2" y="116.8" width="12.8" height="57.3" fill="#0d47a1"/>
+<rect x="553.2" y="101.6" width="12.8" height="15.2" fill="#1976d2"/>
+<rect x="553.2" y="47.5" width="12.8" height="54.1" fill="#64b5f6"/>
+<rect x="566.8" y="188.6" width="12.8" height="1.4" fill="#1b5e20"/>
+<rect x="566.8" y="177.3" width="12.8" height="11.4" fill="#43a047"/>
+<rect x="566.8" y="172.8" width="12.8" height="4.5" fill="#81c784"/>
+<rect x="566.8" y="98.0" width="12.8" height="74.8" fill="#0d47a1"/>
+<rect x="566.8" y="84.0" width="12.8" height="14.1" fill="#1976d2"/>
+<rect x="566.8" y="12.4" width="12.8" height="71.6" fill="#64b5f6"/>
+<rect x="580.4" y="183.1" width="12.8" height="6.9" fill="#43a047"/>
+<rect x="580.4" y="179.7" width="12.8" height="3.4" fill="#81c784"/>
+<rect x="580.4" y="134.3" width="12.8" height="45.5" fill="#0d47a1"/>
+<rect x="580.4" y="119.9" width="12.8" height="14.4" fill="#1976d2"/>
+<rect x="580.4" y="87.4" width="12.8" height="32.5" fill="#64b5f6"/>
+<rect x="594.0" y="177.7" width="12.8" height="12.3" fill="#43a047"/>
+<rect x="594.0" y="168.1" width="12.8" height="9.6" fill="#81c784"/>
+<rect x="594.0" y="121.6" width="12.8" height="46.5" fill="#0d47a1"/>
+<rect x="594.0" y="106.3" width="12.8" height="15.3" fill="#1976d2"/>
+<rect x="594.0" y="82.3" width="12.8" height="24.0" fill="#64b5f6"/>
+<text x="600.4" y="207" text-anchor="middle" font-size="6" fill="#666">2025-W49</text>
+<rect x="607.6" y="184.0" width="12.8" height="6.0" fill="#43a047"/>
+<rect x="607.6" y="170.5" width="12.8" height="13.5" fill="#81c784"/>
+<rect x="607.6" y="126.8" width="12.8" height="43.7" fill="#0d47a1"/>
+<rect x="607.6" y="102.5" width="12.8" height="24.3" fill="#1976d2"/>
+<rect x="607.6" y="89.6" width="12.8" height="12.9" fill="#64b5f6"/>
+<rect x="621.1999999999999" y="187.3" width="12.8" height="2.7" fill="#43a047"/>
+<rect x="621.1999999999999" y="178.8" width="12.8" height="8.6" fill="#81c784"/>
+<rect x="621.1999999999999" y="153.9" width="12.8" height="24.8" fill="#0d47a1"/>
+<rect x="621.1999999999999" y="142.2" width="12.8" height="11.8" fill="#1976d2"/>
+<rect x="621.1999999999999" y="129.3" width="12.8" height="12.8" fill="#64b5f6"/>
+<rect x="634.8" y="172.5" width="12.8" height="17.5" fill="#43a047"/>
+<rect x="634.8" y="165.3" width="12.8" height="7.1" fill="#81c784"/>
+<rect x="634.8" y="153.0" width="12.8" height="12.3" fill="#0d47a1"/>
+<rect x="634.8" y="130.9" width="12.8" height="22.1" fill="#1976d2"/>
+<rect x="634.8" y="117.0" width="12.8" height="13.9" fill="#64b5f6"/>
+<rect x="648.4" y="175.4" width="12.8" height="14.6" fill="#43a047"/>
+<rect x="648.4" y="174.4" width="12.8" height="1.0" fill="#81c784"/>
+<rect x="648.4" y="168.1" width="12.8" height="6.3" fill="#0d47a1"/>
+<rect x="648.4" y="144.0" width="12.8" height="24.1" fill="#1976d2"/>
+<rect x="648.4" y="132.3" width="12.8" height="11.8" fill="#64b5f6"/>
+<rect x="662.0" y="174.1" width="12.8" height="15.9" fill="#43a047"/>
+<rect x="662.0" y="165.0" width="12.8" height="9.1" fill="#0d47a1"/>
+<rect x="662.0" y="128.0" width="12.8" height="37.1" fill="#1976d2"/>
+<rect x="662.0" y="100.7" width="12.8" height="27.3" fill="#64b5f6"/>
+<rect x="675.6" y="179.3" width="12.8" height="10.7" fill="#43a047"/>
+<rect x="675.6" y="178.9" width="12.8" height="0.4" fill="#81c784"/>
+<rect x="675.6" y="171.4" width="12.8" height="7.5" fill="#0d47a1"/>
+<rect x="675.6" y="150.4" width="12.8" height="21.0" fill="#1976d2"/>
+<rect x="675.6" y="106.6" width="12.8" height="43.8" fill="#64b5f6"/>
+<rect x="689.1999999999999" y="187.1" width="12.8" height="2.9" fill="#43a047"/>
+<rect x="689.1999999999999" y="181.4" width="12.8" height="5.7" fill="#81c784"/>
+<rect x="689.1999999999999" y="148.3" width="12.8" height="33.0" fill="#0d47a1"/>
+<rect x="689.1999999999999" y="145.2" width="12.8" height="3.1" fill="#1976d2"/>
+<rect x="689.1999999999999" y="103.4" width="12.8" height="41.8" fill="#64b5f6"/>
+<rect x="702.8" y="184.1" width="12.8" height="5.9" fill="#43a047"/>
+<rect x="702.8" y="160.9" width="12.8" height="23.2" fill="#0d47a1"/>
+<rect x="702.8" y="149.7" width="12.8" height="11.2" fill="#1976d2"/>
+<rect x="702.8" y="119.7" width="12.8" height="29.9" fill="#64b5f6"/>
+<text x="709.1999999999999" y="207" text-anchor="middle" font-size="6" fill="#666">2026-W05</text>
+<rect x="716.4" y="181.1" width="12.8" height="8.9" fill="#43a047"/>
+<rect x="716.4" y="179.0" width="12.8" height="2.1" fill="#81c784"/>
+<rect x="716.4" y="123.0" width="12.8" height="56.0" fill="#0d47a1"/>
+<rect x="716.4" y="118.8" width="12.8" height="4.3" fill="#1976d2"/>
+<rect x="716.4" y="76.1" width="12.8" height="42.7" fill="#64b5f6"/>
+<rect x="730.0" y="175.1" width="12.8" height="14.9" fill="#43a047"/>
+<rect x="730.0" y="158.2" width="12.8" height="16.9" fill="#0d47a1"/>
+<rect x="730.0" y="137.4" width="12.8" height="20.9" fill="#1976d2"/>
+<rect x="730.0" y="120.3" width="12.8" height="17.0" fill="#64b5f6"/>
+<rect x="743.6" y="175.8" width="12.8" height="14.2" fill="#43a047"/>
+<rect x="50" y="220" width="10" height="8" fill="#1b5e20"/>
+<text x="64" y="227" font-size="8" fill="#333">White Premium</text>
+<rect x="150" y="220" width="10" height="8" fill="#43a047"/>
+<text x="164" y="227" font-size="8" fill="#333">White Select</text>
+<rect x="250" y="220" width="10" height="8" fill="#81c784"/>
+<text x="264" y="227" font-size="8" fill="#333">White Mini</text>
+<rect x="350" y="220" width="10" height="8" fill="#0d47a1"/>
+<text x="364" y="227" font-size="8" fill="#333">Blue Premium</text>
+<rect x="450" y="220" width="10" height="8" fill="#1976d2"/>
+<text x="464" y="227" font-size="8" fill="#333">Blue Select</text>
+<rect x="550" y="220" width="10" height="8" fill="#64b5f6"/>
+<text x="564" y="227" font-size="8" fill="#333">Blue Mini</text>
+</svg>
+<rect x="662.0000000000001" y="110.7" width="12.8" height="24.2" fill="#1b5e20"/>
+<rect x="675.6" y="180.4" width="12.8" height="9.6" fill="#1976d2"/>
+<rect x="675.6" y="180.1" width="12.8" height="0.4" fill="#0d47a1"/>
+<rect x="675.6" y="173.4" width="12.8" height="6.7" fill="#81c784"/>
+<rect x="675.6" y="154.8" width="12.8" height="18.6" fill="#43a047"/>
+<rect x="675.6" y="116.1" width="12.8" height="38.7" fill="#1b5e20"/>
+<rect x="689.2" y="187.4" width="12.8" height="2.6" fill="#1976d2"/>
+<rect x="689.2" y="182.3" width="12.8" height="5.0" fill="#0d47a1"/>
+<rect x="689.2" y="153.1" width="12.8" height="29.2" fill="#81c784"/>
+<rect x="689.2" y="150.3" width="12.8" height="2.8" fill="#43a047"/>
+<rect x="689.2" y="113.3" width="12.8" height="37.0" fill="#1b5e20"/>
+<rect x="702.8000000000001" y="184.4" width="12.8" height="5.6" fill="#1976d2"/>
+<rect x="702.8000000000001" y="163.9" width="12.8" height="20.5" fill="#81c784"/>
+<rect x="702.8000000000001" y="154.0" width="12.8" height="9.9" fill="#43a047"/>
+<rect x="702.8000000000001" y="127.5" width="12.8" height="26.5" fill="#1b5e20"/>
+<text x="709.2" y="207" text-anchor="middle" font-size="6" fill="#666">2026-W05</text>
+<rect x="716.4000000000001" y="182.1" width="12.8" height="7.9" fill="#1976d2"/>
+<rect x="716.4000000000001" y="180.3" width="12.8" height="1.8" fill="#0d47a1"/>
+<rect x="716.4000000000001" y="130.7" width="12.8" height="49.5" fill="#81c784"/>
+<rect x="716.4000000000001" y="127.0" width="12.8" height="3.8" fill="#43a047"/>
+<rect x="716.4000000000001" y="89.2" width="12.8" height="37.8" fill="#1b5e20"/>
+<rect x="730.0000000000001" y="176.8" width="12.8" height="13.2" fill="#1976d2"/>
+<rect x="730.0000000000001" y="161.9" width="12.8" height="14.9" fill="#81c784"/>
+<rect x="730.0000000000001" y="143.4" width="12.8" height="18.5" fill="#43a047"/>
+<rect x="730.0000000000001" y="128.3" width="12.8" height="15.1" fill="#1b5e20"/>
+<rect x="743.6" y="177.4" width="12.8" height="12.6" fill="#1976d2"/>
+<rect x="50" y="220" width="10" height="8" fill="#1b5e20"/>
+<text x="64" y="227" font-size="8" fill="#333">White Premium</text>
+<rect x="150" y="220" width="10" height="8" fill="#43a047"/>
+<text x="164" y="227" font-size="8" fill="#333">White Select</text>
+<rect x="250" y="220" width="10" height="8" fill="#81c784"/>
+<text x="264" y="227" font-size="8" fill="#333">White Mini</text>
+<rect x="350" y="220" width="10" height="8" fill="#0d47a1"/>
+<text x="364" y="227" font-size="8" fill="#333">Blue Premium</text>
+<rect x="450" y="220" width="10" height="8" fill="#1976d2"/>
+<text x="464" y="227" font-size="8" fill="#333">Blue Select</text>
+<rect x="550" y="220" width="10" height="8" fill="#64b5f6"/>
+<text x="564" y="227" font-size="8" fill="#333">Blue Mini</text>
+</svg>
+
+</div>
+
+<!-- Table: Corte por variedad y finca -->
+<div class="section-title">Corte Acumulado por Variedad y Finca (Feb 2025 – Feb 2026)</div>
+<table>
+  <thead>
+    <tr>
+      <th>Variedad</th>
+      <th>SKY 1</th>
+      <th>SKY 2</th>
+      <th>SKY 3</th>
+      <th>SKY 6</th>
+      <th>TOTAL</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>White Premium</strong></td><td>93,979</td><td>74,000</td><td>14,528</td><td>190,660</td><td><strong>373,167</strong></td></tr>
+    <tr><td><strong>White Mini Solo</strong></td><td>66,809</td><td>128,200</td><td>18,246</td><td>323,418</td><td><strong>536,673</strong></td></tr>
+    <tr><td><strong>White Select</strong></td><td>147,745</td><td>104,432</td><td>324</td><td>52,744</td><td><strong>305,245</strong></td></tr>
+    <tr><td><strong>White Mini</strong></td><td>18,160</td><td>18,072</td><td>46,882</td><td>166,385</td><td><strong>249,499</strong></td></tr>
+    <tr><td><strong>Blue Premium</strong></td><td>60,920</td><td>320</td><td>&mdash;</td><td>84,192</td><td><strong>145,432</strong></td></tr>
+    <tr><td><strong>Blue Select</strong></td><td>57,299</td><td>&mdash;</td><td>&mdash;</td><td>87,808</td><td><strong>145,107</strong></td></tr>
+  </tbody>
+  <tfoot>
+    <tr><td>Total Hortensia</td><td>444,912</td><td>325,024</td><td>79,980</td><td>905,207</td><td>1,755,123</td></tr>
+  </tfoot>
+</table>
+
+<div style="margin-top:10px;">
+  <table>
+    <thead>
+      <tr>
+        <th>Otros Cultivos</th>
+        <th>SKY 1</th>
+        <th>SKY 2</th>
+        <th>SKY 3</th>
+        <th>SKY 6</th>
+        <th>TOTAL</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#fff3e0;"><td><strong>Lepidium</strong></td><td>2,108,695</td><td>2,383,380</td><td>1,140,050</td><td>&mdash;</td><td><strong>5,632,125</strong></td></tr>
+      <tr style="background:#f3e5f5;"><td><strong>Matricaria</strong></td><td>627,545</td><td>176,670</td><td>&mdash;</td><td>&mdash;</td><td><strong>804,215</strong></td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td>Total General</td><td>3,181,152</td><td>2,885,074</td><td>1,220,030</td><td>905,207</td><td>8,191,463</td></tr>
+    </tfoot>
+  </table>
+</div>
+
+<div class="potential-note" style="margin-top:8px;">
+  Datos de recepcion en poscosecha (52 semanas, corregido por suma de columnas individuales). SKY 7 no registra corte en este periodo. SKY 4 y SKY 5 excluidas (volumen minimo).
+  Nota: Las camas actualmente en Lepidium y Matricaria representan el potencial de conversion a Hortensia.
+  Clasificacion: 01 = Premium, 02 = Mini Solo (White) / Select (Blue), 03 = Select, 05 = Mini.
+</div>
+
+<!-- Productividad por Finca -->
+<div class="section-title" style="margin-top:14px;">Productividad por Finca &mdash; Hortensia (Ultima Fase Completada)</div>
+<table>
+  <thead>
+    <tr>
+      <th>Finca</th>
+      <th>Tallos Cosechados</th>
+      <th>Plantas Activas</th>
+      <th>Tallos / Planta</th>
+      <th>Bloques</th>
+      <th>Camas</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>SKY 1</strong> (La Ceja)</td><td>324,532</td><td>57,490</td><td><strong>5.65</strong></td><td>26</td><td>1,197</td></tr>
+    <tr><td><strong>SKY 2</strong> (La Ceja)</td><td>254,417</td><td>54,373</td><td><strong>4.68</strong></td><td>9</td><td>625</td></tr>
+    <tr><td><strong>SKY 3</strong> (La Ceja)</td><td>57,605</td><td>21,730</td><td><strong>2.65</strong></td><td>7</td><td>419</td></tr>
+    <tr><td><strong>SKY 6</strong> (La Ceja)</td><td>750,541</td><td>222,973</td><td><strong>3.37</strong></td><td>19</td><td>2,431</td></tr>
+  </tbody>
+  <tfoot>
+    <tr><td>Total</td><td>1,387,095</td><td>356,566</td><td><strong>3.89</strong></td><td>61</td><td>4,672</td></tr>
+  </tfoot>
+</table>
+<div class="potential-note" style="margin-top:6px;">
+  Productividad = tallos cosechados entre dos podas consecutivas / plantas activas por bloque.
+  Ventana: ultima fase completada por bloque seg&uacute;n hist&oacute;rico de podas.
+  SKY 4, SKY 5, SKY 7 excluidas (sin datos suficientes de hortensia en podas).
+</div>
+
+<div class="footer">
+  <strong>CONFIDENCIAL</strong> — Preparado exclusivamente para: <strong>SUNSHINE BOUQUETS</strong><br>
+  Documento ID: <strong>SF-SUN-20260225-001</strong> | Fecha: 25 febrero 2026 | Sky Flowers S.A.S.
+  <span class="doc-id">Prohibida su reproducción o distribución sin autorización • Este documento es trazable y su uso indebido será sujeto a acciones legales</span>
+</div>
+
+</body>
+</html>
